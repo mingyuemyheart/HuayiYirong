@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/reTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/llBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:gravity="center_vertical"
+        android:background="@drawable/shawn_selector_btn_back"
+        android:padding="10dp">
+
+        <ImageView
+            android:layout_width="@dimen/level_2"
+            android:layout_height="@dimen/level_2"
+            android:src="@drawable/shawn_icon_back"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_centerInParent="true"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tv1"
+            android:layout_width="80dp"
+            android:layout_height="25dp"
+            android:background="@drawable/shawn_bg_corner_left_press"
+            android:textSize="@dimen/level_4"
+            android:textColor="@color/white"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/tv2"
+            android:layout_width="80dp"
+            android:layout_height="25dp"
+            android:background="@drawable/shawn_bg_corner_right"
+            android:textSize="@dimen/level_4"
+            android:textColor="@color/text_color3"
+            android:gravity="center"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

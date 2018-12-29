@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|center"
+                android:background="@drawable/shawn_bg_corner_white"
+                android:orientation="horizontal">
+
+    <RelativeLayout
+        android:id="@+id/reTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_color3"
+            android:textSize="@dimen/level_3"/>
+
+        <TextView
+            android:id="@+id/tvContent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvTitle"
+            android:layout_marginTop="3dp"
+            android:textColor="@color/text_color4"
+            android:textSize="@dimen/level_4"/>
+
+        <TextView
+            android:id="@+id/tvTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvContent"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/text_color4"
+            android:textSize="@dimen/level_5"/>
+
+        <TextView
+            android:id="@+id/tvState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:textColor="@color/text_color4"
+            android:textSize="@dimen/level_5"/>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/llControl"
+        android:layout_below="@+id/reTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tvPass"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="通过"
+            android:background="@drawable/shawn_selector_pass"
+            android:textColor="#628BF0"
+            android:gravity="center"
+            android:textSize="@dimen/level_4"/>
+
+        <TextView
+            android:id="@+id/tvRefuse"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="打回"
+            android:background="@drawable/shawn_selector_refuse"
+            android:textColor="@color/red"
+            android:gravity="center"
+            android:textSize="@dimen/level_4"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

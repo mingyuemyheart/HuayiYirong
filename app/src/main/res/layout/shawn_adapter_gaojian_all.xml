@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/shawn_bg_corner_white"
+                android:gravity="center_vertical|center"
+                android:orientation="horizontal"
+                android:padding="10dp">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text_color3"
+        android:textSize="@dimen/level_3"/>
+
+    <TextView
+        android:id="@+id/tvContent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvTitle"
+        android:layout_marginTop="3dp"
+        android:textColor="@color/text_color4"
+        android:textSize="@dimen/level_4"/>
+
+    <TextView
+        android:id="@+id/tvTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvContent"
+        android:layout_marginTop="5dp"
+        android:textColor="@color/text_color4"
+        android:textSize="@dimen/level_5"/>
+
+    <ImageView
+        android:id="@+id/ivSource"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="3dp"
+        android:layout_toStartOf="@+id/tvState"/>
+
+    <TextView
+        android:id="@+id/tvState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:textColor="@color/text_color4"
+        android:textSize="@dimen/level_5"/>
+
+</RelativeLayout>

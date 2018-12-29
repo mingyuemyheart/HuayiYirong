@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorCotent"
+                android:orientation="vertical">
+
+    <include
+        android:id="@+id/reTitle"
+        layout="@layout/shawn_layout_title"/>
+
+    <LinearLayout
+        android:id="@+id/llPwd1"
+        android:layout_below="@+id/reTitle"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="50dp"
+        android:background="@drawable/shawn_bg_corner_pwd"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/shawn_icon_pwd_gray"/>
+
+        <EditText
+            android:id="@+id/etPwdOld"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/transparent"
+            android:hint="原密码"
+            android:singleLine="true"
+            android:textColor="@color/text_color4"
+            android:textColorHint="@color/text_color2"
+            android:textSize="@dimen/level_4"/>
+
+        <ImageView
+            android:id="@+id/ivUClose"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/shawn_icon_close_gray"
+            android:visibility="gone"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llPwd2"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_below="@+id/llPwd1"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="50dp"
+        android:background="@drawable/shawn_bg_corner_pwd"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/shawn_icon_pwd_gray"/>
+
+        <EditText
+            android:id="@+id/etPwdNew"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/transparent"
+            android:hint="新密码"
+            android:inputType="textPassword"
+            android:singleLine="true"
+            android:textColor="@color/text_color4"
+            android:textColorHint="@color/text_color2"
+            android:textSize="@dimen/level_4"/>
+
+        <ImageView
+            android:id="@+id/ivPClose"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/shawn_icon_close_gray"
+            android:visibility="gone"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llPwd3"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_below="@+id/llPwd2"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="50dp"
+        android:background="@drawable/shawn_bg_corner_pwd"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/shawn_icon_pwd_gray"/>
+
+        <EditText
+            android:id="@+id/etPwdConfirm"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/transparent"
+            android:hint="重复新密码"
+            android:inputType="textPassword"
+            android:singleLine="true"
+            android:textColor="@color/text_color4"
+            android:textColorHint="@color/text_color2"
+            android:textSize="@dimen/level_4"/>
+
+        <ImageView
+            android:id="@+id/ivCClose"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/shawn_icon_close_gray"
+            android:visibility="gone"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvLogin"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_below="@+id/llPwd3"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="50dp"
+        android:background="@drawable/shawn_selector_login"
+        android:gravity="center_vertical|center"
+        android:orientation="horizontal"
+        android:text="确定"
+        android:textColor="@color/white"
+        android:textSize="@dimen/level_3"/>
+
+    <com.wang.avi.AVLoadingIndicatorView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/loadingView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        app:indicator="LineScalePulseOutRapid"
+        app:indicator_color="@color/refresh_color1"/>
+
+</RelativeLayout>
