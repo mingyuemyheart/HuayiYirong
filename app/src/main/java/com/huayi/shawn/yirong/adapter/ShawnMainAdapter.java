@@ -9,6 +9,7 @@ import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.huayi.shawn.yirong.R;
@@ -79,6 +80,10 @@ public class ShawnMainAdapter extends BaseAdapter {
 			mHolder.imageView.setImageResource(R.drawable.shawn_icon_resource);
 		}else if (TextUtils.equals(dto.title, "稿件")) {
 			mHolder.imageView.setImageResource(R.drawable.shawn_icon_gaojian);
+		}else if (TextUtils.equals(dto.title, "预警")) {
+			mHolder.imageView.setImageResource(R.drawable.shawn_icon_warning);
+		}else if (TextUtils.equals(dto.title, "服务提示")) {
+			mHolder.imageView.setImageResource(R.drawable.shawn_icon_service);
 		}else if (TextUtils.equals(dto.title, "设置")) {
 			mHolder.imageView.setImageResource(R.drawable.shawn_icon_setting);
 		}

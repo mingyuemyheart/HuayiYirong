@@ -23,9 +23,9 @@
     <color name="red">#AF1610</color>
     <color name="colorCotent">#F7F8F7</color>
 
-    <color name="refresh_color1">#F2B05B</color>
-    <color name="refresh_color2">#A0F2B05B</color>
-    <color name="refresh_color3">#80F2B05B</color>
-    <color name="refresh_color4">#40F2B05B</color>
+    <color name="refresh_color1">#628BF0</color>
+    <color name="refresh_color2">#A0628BF0</color>
+    <color name="refresh_color3">#80628BF0</color>
+    <color name="refresh_color4">#40628BF0</color>
 
 </resources>

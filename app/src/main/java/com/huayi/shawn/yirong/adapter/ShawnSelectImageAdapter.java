@@ -69,9 +69,10 @@ public class ShawnSelectImageAdapter extends BaseAdapter {
 		
 		mHolder.imageView1.setTag(position);
 		
-		ShawnDto dto = mArrayList.get(position);
-		if (!TextUtils.isEmpty(dto.filePath)) {
-			File file = new File(dto.filePath);
+		final ShawnDto dto = mArrayList.get(position);
+
+		if (!TextUtils.isEmpty(dto.imgPath)) {
+			File file = new File(dto.imgPath);
 			if (file.exists()) {
 				Picasso.get().load(file).centerCrop().resize(200, 200).into(mHolder.imageView);
 				mHolder.imageView.setLayoutParams(params);
@@ -83,6 +84,14 @@ public class ShawnSelectImageAdapter extends BaseAdapter {
 		}else {
 			mHolder.imageView1.setImageResource(R.drawable.shawn_icon_unselected);
 		}
+
+		mHolder.imageView1.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				dto.isSelected = !dto.isSelected;
+				notifyDataSetChanged();
+			}
+		});
 		
 		return convertView;
 	}

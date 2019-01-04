@@ -1,6 +1,7 @@
 package com.huayi.shawn.yirong.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,7 +11,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.huayi.shawn.yirong.R;
+import com.huayi.shawn.yirong.common.CONST;
 import com.huayi.shawn.yirong.dto.ShawnDto;
+import com.huayi.shawn.yirong.util.CommonUtil;
 
 import java.util.List;
 
@@ -24,7 +27,7 @@ public class ShawnResourceAdapter extends BaseAdapter {
 	private List<ShawnDto> mArrayList;
 
 	private final class ViewHolder{
-		TextView tvTitle,tvTime;
+		TextView tvTitle,tvTime,tvSize;
 		ImageView imageView,ivSelected;
 	}
 
@@ -58,6 +61,7 @@ public class ShawnResourceAdapter extends BaseAdapter {
 			mHolder.imageView = convertView.findViewById(R.id.imageView);
 			mHolder.tvTitle = convertView.findViewById(R.id.tvTitle);
 			mHolder.tvTime = convertView.findViewById(R.id.tvTime);
+			mHolder.tvSize = convertView.findViewById(R.id.tvSize);
 			mHolder.ivSelected = convertView.findViewById(R.id.ivSelected);
 			convertView.setTag(mHolder);
 		}else {
@@ -74,25 +78,47 @@ public class ShawnResourceAdapter extends BaseAdapter {
 			mHolder.tvTime.setText(dto.time);
 		}
 
+		if (TextUtils.equals(dto.fileType, CONST.FILETYPE5)) {
+			mHolder.tvSize.setText("");
+		}else {
+			mHolder.tvSize.setText(CommonUtil.getFormatSize(dto.fileSize));
+		}
+
 		//1图片、2视频、3音频、4文档、5文件夹
-		if (TextUtils.equals(dto.fileType, "1")) {
+		if (TextUtils.equals(dto.fileType, CONST.FILETYPE1)) {
 			mHolder.imageView.setImageResource(R.drawable.shawn_icon_image);
-		}else if (TextUtils.equals(dto.fileType, "2")) {
+		}else if (TextUtils.equals(dto.fileType, CONST.FILETYPE2)) {
 			mHolder.imageView.setImageResource(R.drawable.shawn_icon_video);
-		}else if (TextUtils.equals(dto.fileType, "3")) {
+		}else if (TextUtils.equals(dto.fileType, CONST.FILETYPE3)) {
 			mHolder.imageView.setImageResource(R.drawable.shawn_icon_txt);
-		}else if (TextUtils.equals(dto.fileType, "4")) {
-			mHolder.imageView.setImageResource(R.drawable.shawn_icon_word);
-		}else if (TextUtils.equals(dto.fileType, "5")) {
+		}else if (TextUtils.equals(dto.fileType, CONST.FILETYPE4)) {
+			String lowCase = dto.dataUrl;
+			if (lowCase.contains(CONST.doc) || lowCase.endsWith(CONST.docx)) {
+				mHolder.imageView.setImageResource(R.drawable.shawn_icon_word);
+			}else if (lowCase.endsWith(CONST.ppt) || lowCase.endsWith(CONST.pptx)) {
+				mHolder.imageView.setImageResource(R.drawable.shawn_icon_ppt);
+			}else if (lowCase.endsWith(CONST.pdf)) {
+				mHolder.imageView.setImageResource(R.drawable.shawn_icon_pdf);
+			}else if (lowCase.endsWith(CONST.xls) || lowCase.endsWith(CONST.xlsx)) {
+				mHolder.imageView.setImageResource(R.drawable.shawn_icon_xls);
+			}else {
+				mHolder.imageView.setImageResource(R.drawable.shawn_icon_txt);
+			}
+		}else if (TextUtils.equals(dto.fileType, CONST.FILETYPE5)) {
 			mHolder.imageView.setImageResource(R.drawable.shawn_icon_files);
 		}else {
 			mHolder.imageView.setImageResource(R.drawable.shawn_icon_txt);
 		}
 
-		if (dto.isSelected) {
-			mHolder.ivSelected.setImageResource(R.drawable.shawn_icon_selected);
+		if (TextUtils.equals(dto.title, CONST.lastFile)) {
+			mHolder.ivSelected.setVisibility(View.INVISIBLE);
 		}else {
-			mHolder.ivSelected.setImageResource(R.drawable.shawn_icon_unselected);
+			mHolder.ivSelected.setVisibility(View.VISIBLE);
+			if (dto.isSelected) {
+				mHolder.ivSelected.setImageResource(R.drawable.shawn_icon_selected);
+			}else {
+				mHolder.ivSelected.setImageResource(R.drawable.shawn_icon_unselected);
+			}
 		}
 
 		mHolder.ivSelected.setOnClickListener(new View.OnClickListener() {
@@ -100,6 +126,11 @@ public class ShawnResourceAdapter extends BaseAdapter {
 			public void onClick(View v) {
 				dto.isSelected = !dto.isSelected;
 				notifyDataSetChanged();
+
+				//发布广播，更新资源库底部操作按钮状态
+				Intent intent = new Intent();
+				intent.setAction(CONST.BROADCAST_CONTROL);
+				context.sendBroadcast(intent);
 			}
 		});
 

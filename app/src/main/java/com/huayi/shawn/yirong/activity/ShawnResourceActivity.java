@@ -62,13 +62,13 @@ public class ShawnResourceActivity extends ShawnBaseActivity implements View.OnC
         Fragment fragment = new ShawnResourceFragment();
         Bundle bundle = new Bundle();
         bundle.putString("columnId", "1");//个人库，columnid
-        bundle.putString("fileId", "0");//文件夹id
+        bundle.putString("parentId", "0");//父级id
         fragment.setArguments(bundle);
         fragments.add(fragment);
         fragment = new ShawnResourceFragment();
         bundle = new Bundle();
         bundle.putString("columnId", "2");//公共库，columnid
-        bundle.putString("fileId", "0");//文件夹id
+        bundle.putString("parentId", "0");//父级id
         fragment.setArguments(bundle);
         fragments.add(fragment);
 

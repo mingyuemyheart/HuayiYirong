@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
@@ -39,6 +40,7 @@ public class ShawnGaojianCheckFragment extends Fragment {
     private ShawnGaojianCheckAdapter mAdapter;
     private List<ShawnDto> dataList = new ArrayList<>();
     private SwipeRefreshLayout refreshLayout;//下拉刷新布局
+    private int page = 1;
 
     @Nullable
     @Override
@@ -99,10 +101,22 @@ public class ShawnGaojianCheckFragment extends Fragment {
                 mAdapter.notifyDataSetChanged();
             }
         });
+        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE && view.getLastVisiblePosition() == view.getCount() - 1) {
+                    page++;
+                    OkHttpList();
+                }
+            }
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+            }
+        });
     }
 
     private void OkHttpList() {
-        final String url = "http://47.105.63.187:8081/interfaces/article/getverify?token="+MyApplication.TOKEN;
+        final String url = String.format("http://47.105.63.187:8081/interfaces/article/getverify?token=%s&page=%s", MyApplication.TOKEN, page);
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -144,6 +158,9 @@ public class ShawnGaojianCheckFragment extends Fragment {
                                                 }
                                                 if (!itemObj.isNull("state")) {
                                                     dto.state = itemObj.getString("state");
+                                                }
+                                                if (!itemObj.isNull("type")) {
+                                                    dto.source = itemObj.getString("type");
                                                 }
                                                 dataList.add(dto);
                                             }

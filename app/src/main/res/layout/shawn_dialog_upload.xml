@@ -111,7 +111,7 @@
         android:background="@drawable/shawn_selector_bottom"
         android:gravity="center"
         android:text="取消"
-        android:textColor="#628BF0"
+        android:textColor="@color/refresh_color1"
         android:textSize="@dimen/level_4"/>
 
 </LinearLayout>

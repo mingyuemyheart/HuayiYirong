@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,8 +38,9 @@ public class ShawnGaojianCheckAdapter extends BaseAdapter {
 	private List<ShawnDto> mArrayList;
 
 	private final class ViewHolder{
-		TextView tvTitle,tvContent,tvTime,tvState,tvPass,tvRefuse;
+		TextView tvTitle,tvTime,tvState,tvPass,tvRefuse;
 		LinearLayout llControl;
+		ImageView ivSource;
 	}
 
 	public ShawnGaojianCheckAdapter(Activity activity, List<ShawnDto> mArrayList) {
@@ -69,12 +71,12 @@ public class ShawnGaojianCheckAdapter extends BaseAdapter {
 			convertView = mInflater.inflate(R.layout.shawn_adapter_gaojian_check, null);
 			mHolder = new ViewHolder();
 			mHolder.tvTitle = convertView.findViewById(R.id.tvTitle);
-			mHolder.tvContent = convertView.findViewById(R.id.tvContent);
 			mHolder.tvTime = convertView.findViewById(R.id.tvTime);
 			mHolder.tvState = convertView.findViewById(R.id.tvState);
 			mHolder.tvPass = convertView.findViewById(R.id.tvPass);
 			mHolder.tvRefuse = convertView.findViewById(R.id.tvRefuse);
 			mHolder.llControl = convertView.findViewById(R.id.llControl);
+			mHolder.ivSource = convertView.findViewById(R.id.ivSource);
 			convertView.setTag(mHolder);
 		}else {
 			mHolder = (ViewHolder) convertView.getTag();
@@ -86,19 +88,31 @@ public class ShawnGaojianCheckAdapter extends BaseAdapter {
 			mHolder.tvTitle.setText(dto.title);
 		}
 
-		if (!TextUtils.isEmpty(dto.content)) {
-			mHolder.tvContent.setText(dto.content);
-		}
-
 		if (!TextUtils.isEmpty(dto.time)) {
 			mHolder.tvTime.setText(dto.time);
 		}
 
+		if (TextUtils.equals(dto.source, "微信")) {
+			mHolder.ivSource.setImageResource(R.drawable.shawn_icon_wx);
+		}else if (TextUtils.equals(dto.source, "微博")) {
+			mHolder.ivSource.setImageResource(R.drawable.shawn_icon_weibo);
+		}
+
 		if (!TextUtils.isEmpty(dto.state)) {
 			if (TextUtils.equals(dto.state, "待审核")) {
-				mHolder.tvState.setTextColor(0xff628BF0);
+				mHolder.tvState.setTextColor(0xff6690ea);
 			}else if (TextUtils.equals(dto.state, "待二审")) {
-				mHolder.tvState.setTextColor(activity.getResources().getColor(R.color.red));
+				mHolder.tvState.setTextColor(0xffe50000);
+			}else if (TextUtils.equals(dto.state, "待发布")) {
+				mHolder.tvState.setTextColor(0xfff97306);
+			}else if (TextUtils.equals(dto.state, "待提交")) {
+				mHolder.tvState.setTextColor(0xff15b01a);
+			}else if (TextUtils.equals(dto.state, "已发布")) {
+				mHolder.tvState.setTextColor(0xffd8dcd6);
+			}else if (TextUtils.equals(dto.state, "发布成功")) {
+				mHolder.tvState.setTextColor(0xff929591);
+			}else {
+				mHolder.tvState.setTextColor(0xff6690ea);
 			}
 			mHolder.tvState.setText(dto.state);
 		}
@@ -163,8 +177,8 @@ public class ShawnGaojianCheckAdapter extends BaseAdapter {
 													dto.state = "待二审";
 												}else if (TextUtils.equals(dto.state, "待二审")) {
 													dto.state = "待发布";
+													mArrayList.remove(position);
 												}
-												mArrayList.remove(position);
 												notifyDataSetChanged();
 												Toast.makeText(activity, "审核通过", Toast.LENGTH_SHORT).show();
 											}

@@ -2,8 +2,6 @@ package com.huayi.shawn.yirong.adapter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,8 +13,9 @@ import android.widget.RelativeLayout;
 
 import com.huayi.shawn.yirong.R;
 import com.huayi.shawn.yirong.dto.ShawnDto;
-import com.huayi.shawn.yirong.util.CommonUtil;
+import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -27,7 +26,6 @@ public class ShawnSelectVideoAdapter extends BaseAdapter {
 	private Activity activity;
 	private LayoutInflater mInflater;
 	private List<ShawnDto> mArrayList;
-	private int width;
 	private RelativeLayout.LayoutParams params;
 
 	private final class ViewHolder{
@@ -40,7 +38,7 @@ public class ShawnSelectVideoAdapter extends BaseAdapter {
 		mInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		
 		WindowManager wm = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
-		width = wm.getDefaultDisplay().getWidth();
+		int width = wm.getDefaultDisplay().getWidth();
 		params = new RelativeLayout.LayoutParams(width/4, width/4);
 	}
 
@@ -75,30 +73,28 @@ public class ShawnSelectVideoAdapter extends BaseAdapter {
 		mHolder.imageView1.setTag(position);
 		
 		final ShawnDto dto = mArrayList.get(position);
-		if (!TextUtils.isEmpty(dto.filePath)) {
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					final Bitmap bitmap = CommonUtil.getVideoThumbnail(dto.filePath, width/4, width/4, MediaStore.Video.Thumbnails.MINI_KIND);
-					activity.runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							if (bitmap != null) {
-								mHolder.imageView.setImageBitmap(bitmap);
-								mHolder.imageView.setLayoutParams(params);
-							}
-						}
-					});
-				}
-			}).start();
 
+		if (!TextUtils.isEmpty(dto.imgPath)) {
+			File file = new File(dto.imgPath);
+			if (file.exists()) {
+				Picasso.get().load(file).centerCrop().resize(200, 200).into(mHolder.imageView);
+				mHolder.imageView.setLayoutParams(params);
+			}
 		}
-		
+
 		if (dto.isSelected) {
 			mHolder.imageView1.setImageResource(R.drawable.shawn_icon_selected);
 		}else {
 			mHolder.imageView1.setImageResource(R.drawable.shawn_icon_unselected);
 		}
+
+		mHolder.imageView1.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				dto.isSelected = !dto.isSelected;
+				notifyDataSetChanged();
+			}
+		});
 		
 		return convertView;
 	}

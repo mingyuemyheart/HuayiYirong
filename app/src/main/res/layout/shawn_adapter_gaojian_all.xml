@@ -12,22 +12,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/text_color3"
-        android:textSize="@dimen/level_3"/>
-
-    <TextView
-        android:id="@+id/tvContent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/tvTitle"
-        android:layout_marginTop="3dp"
-        android:textColor="@color/text_color4"
         android:textSize="@dimen/level_4"/>
 
     <TextView
         android:id="@+id/tvTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tvContent"
+        android:layout_below="@+id/tvTitle"
         android:layout_marginTop="5dp"
         android:textColor="@color/text_color4"
         android:textSize="@dimen/level_5"/>

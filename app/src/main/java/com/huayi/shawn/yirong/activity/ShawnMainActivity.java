@@ -94,7 +94,7 @@ public class ShawnMainActivity extends ShawnBaseActivity implements AMapLocation
         refreshLayout.post(new Runnable() {
             @Override
             public void run() {
-                refreshLayout.setRefreshing(true);
+//                refreshLayout.setRefreshing(true);
             }
         });
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -125,6 +125,8 @@ public class ShawnMainActivity extends ShawnBaseActivity implements AMapLocation
         tvPosition = findViewById(R.id.tvPosition);
         tvTemp = findViewById(R.id.tvTemp);
         tvPhe = findViewById(R.id.tvPhe);
+        TextView tvDate = findViewById(R.id.tvDate);
+        tvDate.setText(sdf1.format(new Date()));
         tvTime = findViewById(R.id.tvTime);
 
         refresh();
@@ -138,12 +140,21 @@ public class ShawnMainActivity extends ShawnBaseActivity implements AMapLocation
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ShawnDto dto = dataList.get(position);
+                Intent intent = null;
                 if (TextUtils.equals(dto.title, "设置")) {
-                    startActivity(new Intent(context, ShawnSettingActivity.class));
+                    intent = new Intent(context, ShawnSettingActivity.class);
                 }else if (TextUtils.equals(dto.title, "稿件")) {
-                    startActivity(new Intent(context, ShawnGaojianActivity.class));
+                    intent = new Intent(context, ShawnGaojianActivity.class);
                 }else if (TextUtils.equals(dto.title, "资源库")) {
-                    startActivity(new Intent(context, ShawnResourceActivity.class));
+                    intent = new Intent(context, ShawnResourceActivity.class);
+                }else if (TextUtils.equals(dto.title, "服务提示")) {
+                    intent = new Intent(context, ShawnServiceActivity.class);
+                }else if (TextUtils.equals(dto.title, "预警")) {
+                    intent = new Intent(context, ShawnWarningActivity.class);
+                }
+                if (intent != null) {
+                    intent.putExtra(CONST.ACTIVITY_NAME, dto.title);
+                    startActivity(intent);
                 }
             }
         });
@@ -255,7 +266,7 @@ public class ShawnMainActivity extends ShawnBaseActivity implements AMapLocation
                                             if (!l.isNull("l7")) {
                                                 String time = l.getString("l7");
                                                 if (!TextUtils.isEmpty(time)) {
-                                                    tvTime.setText(sdf1.format(new Date())+time+"发布");
+                                                    tvTime.setText(time);
                                                 }
                                             }
                                             if (!l.isNull("l1")) {
@@ -295,50 +306,69 @@ public class ShawnMainActivity extends ShawnBaseActivity implements AMapLocation
      * 获取主界面数据
      */
     private void OkHttpList() {
-        final String url ="http://47.105.63.187:8081/interfaces/menu/guidance?token="+MyApplication.TOKEN;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                OkHttpUtil.enqueue(new Request.Builder().url(url).build(), new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                    }
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        if (!response.isSuccessful()) {
-                            return;
-                        }
-                        final String result = response.body().string();
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (!TextUtils.isEmpty(result)) {
-                                    try {
-                                        dataList.clear();
-                                        JSONArray array = new JSONArray(result);
-                                        for (int i = 0; i < array.length(); i++) {
-                                            ShawnDto dto = new ShawnDto();
-                                            JSONObject itemObj = array.getJSONObject(i);
-                                            if (!itemObj.isNull("name")) {
-                                                dto.title = itemObj.getString("name");
-                                            }
-                                            dataList.add(dto);
-                                        }
-                                        if (mAdapter != null) {
-                                            mAdapter.notifyDataSetChanged();
-                                        }
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
+        ShawnDto dto = new ShawnDto();
+        dto.title = "稿件";
+        dataList.add(dto);
+        dto = new ShawnDto();
+        dto.title = "资源库";
+        dataList.add(dto);
+        dto = new ShawnDto();
+        dto.title = "预警";
+        dataList.add(dto);
+        dto = new ShawnDto();
+        dto.title = "服务提示";
+        dataList.add(dto);
+        dto = new ShawnDto();
+        dto.title = "设置";
+        dataList.add(dto);
+        if (mAdapter != null) {
+            mAdapter.notifyDataSetChanged();
+        }
 
-                                refreshLayout.setRefreshing(false);
-                            }
-                        });
-                    }
-                });
-            }
-        }).start();
+//        final String url ="http://47.105.63.187:8081/interfaces/menu/guidance?token="+MyApplication.TOKEN;
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                OkHttpUtil.enqueue(new Request.Builder().url(url).build(), new Callback() {
+//                    @Override
+//                    public void onFailure(Call call, IOException e) {
+//                    }
+//                    @Override
+//                    public void onResponse(Call call, Response response) throws IOException {
+//                        if (!response.isSuccessful()) {
+//                            return;
+//                        }
+//                        final String result = response.body().string();
+//                        runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                if (!TextUtils.isEmpty(result)) {
+//                                    try {
+//                                        dataList.clear();
+//                                        JSONArray array = new JSONArray(result);
+//                                        for (int i = 0; i < array.length(); i++) {
+//                                            ShawnDto dto = new ShawnDto();
+//                                            JSONObject itemObj = array.getJSONObject(i);
+//                                            if (!itemObj.isNull("name")) {
+//                                                dto.title = itemObj.getString("name");
+//                                            }
+//                                            dataList.add(dto);
+//                                        }
+//                                        if (mAdapter != null) {
+//                                            mAdapter.notifyDataSetChanged();
+//                                        }
+//                                    } catch (JSONException e) {
+//                                        e.printStackTrace();
+//                                    }
+//                                }
+//
+//                                refreshLayout.setRefreshing(false);
+//                            }
+//                        });
+//                    }
+//                });
+//            }
+//        }).start();
     }
 
     //需要申请的所有权限

@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.LocationManager;
-import android.media.ThumbnailUtils;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -18,6 +17,9 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import com.amap.api.maps.AMap;
+import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.PolygonOptions;
 import com.amap.api.services.district.DistrictItem;
 import com.amap.api.services.district.DistrictResult;
 import com.amap.api.services.district.DistrictSearch;
@@ -38,6 +40,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
@@ -313,6 +316,48 @@ public class CommonUtil {
         }
         height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
         return height;
+    }
+
+    /**
+     * 绘制区域
+     */
+    public static void drawDistrict(final Context context, String keywords, final AMap aMap) {
+        DistrictSearch search = new DistrictSearch(context);
+        DistrictSearchQuery query = new DistrictSearchQuery();
+        query.setKeywords(keywords);//传入关键字
+        query.setShowBoundary(true);//是否返回边界值
+        search.setQuery(query);
+        search.searchDistrictAsyn();
+        search.setOnDistrictSearchListener(new DistrictSearch.OnDistrictSearchListener() {
+            @Override
+            public void onDistrictSearched(DistrictResult districtResult) {
+                if (districtResult == null|| districtResult.getDistrict()==null) {
+                    return;
+                }
+                final DistrictItem item = districtResult.getDistrict().get(0);
+                if (item == null) {
+                    return;
+                }
+                new Thread() {
+                    public void run() {
+                        String[] polyStr = item.districtBoundary();
+                        if (polyStr == null || polyStr.length == 0) {
+                            return;
+                        }
+                        for (String str : polyStr) {
+                            String[] lat = str.split(";");
+                            PolygonOptions polygonOptions = new PolygonOptions();
+                            for (String latstr : lat) {
+                                String[] lats = latstr.split(",");
+                                polygonOptions.add(new LatLng(Double.parseDouble(lats[1]), Double.parseDouble(lats[0])));
+                            }
+                            polygonOptions.strokeWidth(8).strokeColor(0xff059cd4).fillColor(0x5000FF00);
+                            aMap.addPolygon(polygonOptions);
+                        }
+                    }
+                }.start();
+            }
+        });//绑定监听器
     }
 
     /**
@@ -744,20 +789,22 @@ public class CommonUtil {
         List<ShawnDto> list = new ArrayList<>();
         if (context != null) {
             Cursor cursor = context.getContentResolver().query(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI, null, null,
-                    null, null);
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI, null, null, null, null);
             if (cursor != null) {
                 while (cursor.moveToNext()) {
                     int id = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID));
-                    String title = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.TITLE));
                     String displayName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME));
                     String mimeType = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.MIME_TYPE));
-                    String path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));
                     long size = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE));
+                    String title = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.TITLE));
+                    String imgPath = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));
+                    long width = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.WIDTH));
+                    long height = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.HEIGHT));
 
                     ShawnDto dto = new ShawnDto();
                     dto.title = title;
-                    dto.filePath = path;
+                    dto.imgPath = imgPath;
+                    dto.fileSize = size;
                     list.add(0, dto);
                 }
                 cursor.close();
@@ -775,8 +822,8 @@ public class CommonUtil {
         List<ShawnDto> list = new ArrayList<>();
         if (context != null) {
             Cursor cursor = context.getContentResolver().query(
-                    MediaStore.Video.Media.EXTERNAL_CONTENT_URI, null, null,
-                    null, null);
+                    MediaStore.Video.Media.EXTERNAL_CONTENT_URI, null, null, null, null);
+            String[] thumbColumns = {MediaStore.Video.Thumbnails.DATA, MediaStore.Video.Thumbnails.VIDEO_ID};
             if (cursor != null) {
                 while (cursor.moveToNext()) {
                     int id = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID));
@@ -785,13 +832,40 @@ public class CommonUtil {
                     String artist = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.ARTIST));
                     String displayName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME));
                     String mimeType = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.MIME_TYPE));
-                    String path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA));
                     long duration = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION));
                     long size = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.SIZE));
+                    String filePath = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA));
 
+//                    MediaMetadataRetriever retr = new MediaMetadataRetriever();
+//                    retr.setDataSource(filePath);
+////                    Bitmap bm = retr.getFrameAtTime();
+////                    long width = bm.getWidth();
+////                    long height = bm.getHeight();
+//                    long width,height;
+//                    String rotation = retr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION);//视频旋转方向
+//                    if (TextUtils.equals(rotation, "0")) {
+//                        width = Long.valueOf(retr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));//视频宽度
+//                        height = Long.valueOf(retr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));//视频高度
+//                    }else {
+//                        height = Long.valueOf(retr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));//视频宽度
+//                        width = Long.valueOf(retr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));//视频高度
+//                    }
+
+//                    long width = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.WIDTH));
+//                    long height = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.HEIGHT));
+
+                    Cursor thumbCursor = context.getContentResolver().query(
+                            MediaStore.Video.Thumbnails.EXTERNAL_CONTENT_URI, thumbColumns,
+                            MediaStore.Video.Thumbnails.VIDEO_ID + "=" + id, null, null);
+                    String imgPath = "";
+                    if (thumbCursor.moveToFirst()) {
+                        imgPath = thumbCursor.getString(thumbCursor.getColumnIndex(MediaStore.Video.Thumbnails.DATA));
+                    }
                     ShawnDto dto = new ShawnDto();
                     dto.title = title;
-                    dto.filePath = path;
+                    dto.filePath = filePath;
+                    dto.imgPath = imgPath;
+                    dto.fileSize = size;
                     list.add(0, dto);
                 }
                 cursor.close();
@@ -800,11 +874,36 @@ public class CommonUtil {
         return list;
     }
 
-    public static Bitmap getVideoThumbnail(String videoPath, int width, int height, int kind) {
-        // 获取视频的缩略图
-        Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(videoPath, kind);
-        bitmap = ThumbnailUtils.extractThumbnail(bitmap, width, height, ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
-        return bitmap;
+    /**
+     * 格式化问价大小
+     * @param size
+     * @return
+     */
+    public static String getFormatSize(long size) {
+        double kiloByte = size / 1024;
+        if (kiloByte < 1) {
+            return "0K";
+        }
+
+        double megaByte = kiloByte / 1024;
+        if (megaByte < 1) {
+            BigDecimal result1 = new BigDecimal(Double.toString(kiloByte));
+            return result1.setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString() + "KB";
+        }
+
+        double gigaByte = megaByte / 1024;
+        if (gigaByte < 1) {
+            BigDecimal result2 = new BigDecimal(Double.toString(megaByte));
+            return result2.setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString() + "MB";
+        }
+
+        double teraBytes = gigaByte / 1024;
+        if (teraBytes < 1) {
+            BigDecimal result3 = new BigDecimal(Double.toString(gigaByte));
+            return result3.setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString() + "GB";
+        }
+        BigDecimal result4 = new BigDecimal(teraBytes);
+        return result4.setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString()+ "TB";
     }
 
 }

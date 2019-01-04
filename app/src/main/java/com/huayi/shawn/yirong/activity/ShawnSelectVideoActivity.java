@@ -13,8 +13,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.huayi.shawn.yirong.R;
-import com.huayi.shawn.yirong.adapter.ShawnSelectImageAdapter;
 import com.huayi.shawn.yirong.adapter.ShawnSelectVideoAdapter;
+import com.huayi.shawn.yirong.common.CONST;
 import com.huayi.shawn.yirong.dto.ShawnDto;
 import com.huayi.shawn.yirong.util.CommonUtil;
 
@@ -26,7 +26,7 @@ import java.util.List;
  */
 public class ShawnSelectVideoActivity extends ShawnBaseActivity implements View.OnClickListener {
 
-    private Context mContext = null;
+    private Context mContext;
     private ShawnSelectVideoAdapter mAdapter;
     private List<ShawnDto> dataList = new ArrayList<>();
 
@@ -63,10 +63,10 @@ public class ShawnSelectVideoActivity extends ShawnBaseActivity implements View.
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ShawnDto dto = dataList.get(position);
-                dto.isSelected = !dto.isSelected;
-                if (mAdapter != null) {
-                    mAdapter.notifyDataSetChanged();
-                }
+                Intent intent = new Intent(mContext, ShawnVideoActivity.class);
+                intent.putExtra(CONST.ACTIVITY_NAME, dto.title);
+                intent.putExtra(CONST.VIDEO_PATH, dto.filePath);
+                startActivity(intent);
 
             }
         });
@@ -91,10 +91,12 @@ public class ShawnSelectVideoActivity extends ShawnBaseActivity implements View.
                 break;
             case R.id.tvControl:
                 String filePath = null;
+                long fileSize = 0;
                 for (int i = 0; i < dataList.size(); i++) {
                     ShawnDto dto = dataList.get(i);
                     if (dto.isSelected) {
                         filePath = dto.filePath;
+                        fileSize = dto.fileSize;
                         break;
                     }
                 }
@@ -104,6 +106,7 @@ public class ShawnSelectVideoActivity extends ShawnBaseActivity implements View.
                 }
                 Intent intent = new Intent();
                 intent.putExtra("filePath", filePath);
+                intent.putExtra("fileSize", fileSize);
                 setResult(RESULT_OK, intent);
                 finish();
                 break;

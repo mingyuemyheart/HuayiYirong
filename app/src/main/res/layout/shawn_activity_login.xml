@@ -44,7 +44,7 @@
                 android:hint="请输入用户名"
                 android:singleLine="true"
                 android:textColor="@color/white"
-                android:textColorHint="@color/text_color2"
+                android:textColorHint="#80ffffff"
                 android:textSize="@dimen/level_4"/>
 
             <ImageView
@@ -81,7 +81,7 @@
                 android:inputType="textPassword"
                 android:singleLine="true"
                 android:textColor="@color/white"
-                android:textColorHint="@color/text_color2"
+                android:textColorHint="#80ffffff"
                 android:textSize="@dimen/level_4"/>
 
             <ImageView

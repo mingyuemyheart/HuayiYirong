@@ -24,7 +24,7 @@
                 android:scaleType="centerCrop"
                 android:src="@drawable/shawn_bg_main_title"/>
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
@@ -33,6 +33,7 @@
                 android:paddingEnd="25dp">
 
                 <LinearLayout
+                    android:id="@+id/llPosition"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
@@ -54,6 +55,8 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/llTemp"
+                    android:layout_below="@+id/llPosition"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical|bottom"
@@ -79,13 +82,22 @@
                 </LinearLayout>
 
                 <TextView
-                    android:id="@+id/tvTime"
+                    android:layout_below="@+id/llTemp"
+                    android:id="@+id/tvDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"
                     android:textSize="@dimen/level_5"/>
 
-            </LinearLayout>
+                <TextView
+                    android:id="@+id/tvTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/level_3"/>
+
+            </RelativeLayout>
 
         </RelativeLayout>
 

@@ -11,85 +11,164 @@
         android:layout_height="0.5dp"
         android:background="@color/light_gray"/>
 
-    <LinearLayout
-        android:id="@+id/llContainer"
-        android:layout_below="@+id/divider1"
+    <RelativeLayout
+        android:id="@+id/re"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:background="@color/colorCotent"
+        android:layout_below="@+id/divider1">
 
         <LinearLayout
-            android:id="@+id/ll1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:background="@drawable/shawn_selector_mk_files"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:visibility="gone"
+            android:id="@+id/llSearch"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp">
 
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/shawn_icon_mk_files"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:background="@drawable/shawn_bg_corner_edittext">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/shawn_icon_search_black"/>
+
+                <EditText
+                    android:id="@+id/etSearch"
+                    android:background="@color/transparent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:hint="搜索资源库文件"
+                    android:textColorHint="@color/text_color2"
+                    android:textColor="@color/text_color4"
+                    android:textSize="@dimen/level_4"/>
+
+                <ImageView
+                    android:id="@+id/ivClear"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:visibility="gone"
+                    android:src="@drawable/shawn_icon_close_gray"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/shawn_selector_btn_back"
+                android:text="取消"
+                android:gravity="center"
+                android:textColor="@color/refresh_color1"
+                android:textSize="@dimen/level_4"/>
 
         </LinearLayout>
 
-        <TextView
-            android:layout_width="0.5dp"
-            android:layout_height="match_parent"
-            android:background="@color/light_gray"/>
-
         <LinearLayout
-            android:id="@+id/ll2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:background="@drawable/shawn_selector_mk_files"
-            android:gravity="center"
+            android:id="@+id/llContainer"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/shawn_icon_upload_black"/>
+            <LinearLayout
+                android:id="@+id/ll1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/shawn_selector_mk_files"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/shawn_icon_mk_files"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="0.5dp"
+                android:layout_height="match_parent"
+                android:background="@color/light_gray"/>
+
+            <LinearLayout
+                android:id="@+id/ll2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/shawn_selector_mk_files"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/shawn_icon_upload_black"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="0.5dp"
+                android:layout_height="match_parent"
+                android:background="@color/light_gray"/>
+
+            <LinearLayout
+                android:id="@+id/ll3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/shawn_selector_mk_files"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/shawn_icon_search_black"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
-        <TextView
-            android:layout_width="0.5dp"
-            android:layout_height="match_parent"
-            android:background="@color/light_gray"/>
+    </RelativeLayout>
 
-        <LinearLayout
-            android:id="@+id/ll3"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:background="@drawable/shawn_selector_mk_files"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/shawn_icon_search_black"/>
-
-        </LinearLayout>
-
-    </LinearLayout>
+    <TextView
+        android:layout_below="@+id/re"
+        android:id="@+id/tvCount"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginBottom="5dp"
+        android:textSize="@dimen/level_5"
+        android:textColor="@color/text_color4"/>
 
     <TextView
         android:id="@+id/divider2"
-        android:layout_below="@+id/llContainer"
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
+        android:layout_below="@+id/tvCount"
         android:background="@color/light_gray"/>
 
     <android.support.v4.widget.SwipeRefreshLayout
@@ -97,8 +176,8 @@
         android:id="@+id/refreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/divider2"
         android:layout_above="@+id/divider3"
+        android:layout_below="@+id/divider2"
         android:orientation="vertical">
 
         <ListView
@@ -116,16 +195,16 @@
 
     <TextView
         android:id="@+id/divider3"
-        android:layout_above="@+id/llBottom"
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
+        android:layout_above="@+id/llBottom"
         android:background="@color/light_gray"/>
 
     <LinearLayout
         android:id="@+id/llBottom"
-        android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -134,22 +213,24 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
             android:background="@drawable/shawn_selector_mk_files"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp">
 
             <ImageView
+                android:id="@+id/iv4"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
-                android:src="@drawable/shawn_icon_download_blue"/>
+                android:src="@drawable/shawn_icon_download_gray"/>
 
             <TextView
+                android:id="@+id/tv4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="下载"
-                android:textColor="#628BF0"
+                android:textColor="@color/text_color4"
                 android:textSize="@dimen/level_5"/>
 
         </LinearLayout>
@@ -159,22 +240,24 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
             android:background="@drawable/shawn_selector_mk_files"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp">
 
             <ImageView
+                android:id="@+id/iv5"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
-                android:src="@drawable/shawn_icon_delete_blue"/>
+                android:src="@drawable/shawn_icon_delete_gray"/>
 
             <TextView
+                android:id="@+id/tv5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="删除"
-                android:textColor="#628BF0"
+                android:textColor="@color/text_color4"
                 android:textSize="@dimen/level_5"/>
 
         </LinearLayout>
@@ -184,22 +267,24 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
             android:background="@drawable/shawn_selector_mk_files"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp">
 
             <ImageView
+                android:id="@+id/iv6"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
-                android:src="@drawable/shawn_icon_rename_blue"/>
+                android:src="@drawable/shawn_icon_rename_gray"/>
 
             <TextView
+                android:id="@+id/tv6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="重命名"
-                android:textColor="#628BF0"
+                android:textColor="@color/text_color4"
                 android:textSize="@dimen/level_5"/>
 
         </LinearLayout>

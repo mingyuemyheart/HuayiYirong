@@ -87,6 +87,30 @@
             android:name=".activity.ShawnSelectVideoActivity"
             android:screenOrientation="portrait"/>
 
+        <activity
+            android:name=".activity.ShawnSelectFileActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".activity.ShawnServiceActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".activity.ShawnUserActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".activity.ShawnWarningActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".activity.ShawnWarningDetailActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".activity.ShawnVideoActivity"
+            android:screenOrientation="portrait"/>
+
     </application>
 
 </manifest>
