@@ -94,7 +94,7 @@ public class ShawnMainActivity extends ShawnBaseActivity implements AMapLocation
         refreshLayout.post(new Runnable() {
             @Override
             public void run() {
-//                refreshLayout.setRefreshing(true);
+                refreshLayout.setRefreshing(true);
             }
         });
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -287,6 +287,8 @@ public class ShawnMainActivity extends ShawnBaseActivity implements AMapLocation
                                         e.printStackTrace();
                                     }
                                 }
+
+                                refreshLayout.setRefreshing(false);
 
                             }
                         });

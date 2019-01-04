@@ -49,4 +49,14 @@
 
     </LinearLayout>
 
+    <ImageView
+        android:id="@+id/ivShare"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:background="@drawable/shawn_selector_btn_back"
+        android:padding="10dp"
+        android:visibility="gone"/>
+
 </RelativeLayout>

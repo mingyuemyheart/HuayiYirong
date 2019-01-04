@@ -71,8 +71,8 @@ public class ShawnSelectImageAdapter extends BaseAdapter {
 		
 		final ShawnDto dto = mArrayList.get(position);
 
-		if (!TextUtils.isEmpty(dto.imgPath)) {
-			File file = new File(dto.imgPath);
+		if (!TextUtils.isEmpty(dto.filePath)) {
+			File file = new File(dto.filePath);
 			if (file.exists()) {
 				Picasso.get().load(file).centerCrop().resize(200, 200).into(mHolder.imageView);
 				mHolder.imageView.setLayoutParams(params);

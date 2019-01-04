@@ -38,7 +38,7 @@ public class ShawnGaojianCheckAdapter extends BaseAdapter {
 	private List<ShawnDto> mArrayList;
 
 	private final class ViewHolder{
-		TextView tvTitle,tvTime,tvState,tvPass,tvRefuse;
+		TextView tvTitle,tvContent,tvTime,tvState,tvPass,tvRefuse;
 		LinearLayout llControl;
 		ImageView ivSource;
 	}
@@ -72,6 +72,7 @@ public class ShawnGaojianCheckAdapter extends BaseAdapter {
 			mHolder = new ViewHolder();
 			mHolder.tvTitle = convertView.findViewById(R.id.tvTitle);
 			mHolder.tvTime = convertView.findViewById(R.id.tvTime);
+			mHolder.tvContent = convertView.findViewById(R.id.tvContent);
 			mHolder.tvState = convertView.findViewById(R.id.tvState);
 			mHolder.tvPass = convertView.findViewById(R.id.tvPass);
 			mHolder.tvRefuse = convertView.findViewById(R.id.tvRefuse);
@@ -86,6 +87,10 @@ public class ShawnGaojianCheckAdapter extends BaseAdapter {
 
 		if (!TextUtils.isEmpty(dto.title)) {
 			mHolder.tvTitle.setText(dto.title);
+		}
+
+		if (!TextUtils.isEmpty(dto.content)) {
+			mHolder.tvContent.setText(dto.content);
 		}
 
 		if (!TextUtils.isEmpty(dto.time)) {

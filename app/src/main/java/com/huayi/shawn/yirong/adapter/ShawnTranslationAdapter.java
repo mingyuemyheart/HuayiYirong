@@ -17,9 +17,9 @@ import com.huayi.shawn.yirong.util.CommonUtil;
 import java.util.List;
 
 /**
- * 资源库-上传-选择文件
+ * 资源库-传输列表
  */
-public class ShawnSelectFileAdapter extends BaseAdapter {
+public class ShawnTranslationAdapter extends BaseAdapter {
 
 	private Context context;
 	private LayoutInflater mInflater;
@@ -30,7 +30,7 @@ public class ShawnSelectFileAdapter extends BaseAdapter {
 		ImageView imageView,ivSelected;
 	}
 
-	public ShawnSelectFileAdapter(Context context, List<ShawnDto> mArrayList) {
+	public ShawnTranslationAdapter(Context context, List<ShawnDto> mArrayList) {
 		this.context = context;
 		this.mArrayList = mArrayList;
 		mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -55,7 +55,7 @@ public class ShawnSelectFileAdapter extends BaseAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		ViewHolder mHolder;
 		if (convertView == null) {
-			convertView = mInflater.inflate(R.layout.shawn_adapter_select_file, null);
+			convertView = mInflater.inflate(R.layout.shawn_adapter_translation, null);
 			mHolder = new ViewHolder();
 			mHolder.imageView = convertView.findViewById(R.id.imageView);
 			mHolder.tvTitle = convertView.findViewById(R.id.tvTitle);

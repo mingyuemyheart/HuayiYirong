@@ -25,7 +25,7 @@ public class ShawnGaojianAllAdapter extends BaseAdapter {
 	private List<ShawnDto> mArrayList;
 
 	private final class ViewHolder{
-		TextView tvTitle,tvTime,tvState;
+		TextView tvTitle,tvContent,tvTime,tvState;
 		ImageView ivSource;
 	}
 
@@ -57,6 +57,7 @@ public class ShawnGaojianAllAdapter extends BaseAdapter {
 			convertView = mInflater.inflate(R.layout.shawn_adapter_gaojian_all, null);
 			mHolder = new ViewHolder();
 			mHolder.tvTitle = convertView.findViewById(R.id.tvTitle);
+			mHolder.tvContent = convertView.findViewById(R.id.tvContent);
 			mHolder.tvTime = convertView.findViewById(R.id.tvTime);
 			mHolder.tvState = convertView.findViewById(R.id.tvState);
 			mHolder.ivSource = convertView.findViewById(R.id.ivSource);
@@ -69,6 +70,10 @@ public class ShawnGaojianAllAdapter extends BaseAdapter {
 
 		if (!TextUtils.isEmpty(dto.title)) {
 			mHolder.tvTitle.setText(dto.title);
+		}
+
+		if (!TextUtils.isEmpty(dto.content)) {
+			mHolder.tvContent.setText(dto.content);
 		}
 
 		if (!TextUtils.isEmpty(dto.time)) {

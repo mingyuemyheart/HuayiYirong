@@ -223,17 +223,17 @@ public class ShawnResourceFragment extends Fragment implements View.OnClickListe
                 if (TextUtils.equals(dto.fileType, CONST.FILETYPE1)) {
                     intent = new Intent(getActivity(), ShawnImageActivity.class);
                     intent.putExtra(CONST.ACTIVITY_NAME, dto.title);
-                    intent.putExtra(CONST.WEB_URL, dto.dataUrl);
+                    intent.putExtra(CONST.WEB_URL, dto.filePath);
                     startActivity(intent);
                 }else if (TextUtils.equals(dto.fileType, CONST.FILETYPE2)) {
                     intent = new Intent(getActivity(), ShawnVideoActivity.class);
                     intent.putExtra(CONST.ACTIVITY_NAME, dto.title);
-                    intent.putExtra(CONST.WEB_URL, dto.videoUrl);
+                    intent.putExtra(CONST.WEB_URL, dto.filePath);
                     startActivity(intent);
                 }else if (TextUtils.equals(dto.fileType, CONST.FILETYPE3)) {
                     intent = new Intent(getActivity(), ShawnVideoActivity.class);
                     intent.putExtra(CONST.ACTIVITY_NAME, dto.title);
-                    intent.putExtra(CONST.WEB_URL, dto.dataUrl);
+                    intent.putExtra(CONST.WEB_URL, dto.filePath);
                     startActivity(intent);
                 }else if (TextUtils.equals(dto.fileType, CONST.FILETYPE4)) {
                     Toast.makeText(getActivity(), "该类型文件不支持预览", Toast.LENGTH_SHORT).show();
@@ -410,11 +410,15 @@ public class ShawnResourceFragment extends Fragment implements View.OnClickListe
             switch (requestCode) {
                 case 1001://上传文件
                     if (data != null) {
-                        Bundle bundle = data.getExtras();
-                        if (bundle != null) {
-                            String filePath = bundle.getString("filePath");
-                            long fileSize = bundle.getLong("fileSize");
-                            OkHttpUpload(filePath, fileSize);
+                        List<ShawnDto> list = new ArrayList<>();
+                        ShawnDto dto = data.getParcelableExtra("data");
+                        if (dto != null) {
+                            list.add(dto);
+                        }
+                        CommonUtil.saveUploadInfo(getActivity(), list);
+                        Toast.makeText(getActivity(), "文件上传中", Toast.LENGTH_SHORT).show();
+                        if (dto != null) {
+                            OkHttpUpload(dto.filePath, dto.fileSize);
                         }
                     }
                     break;
@@ -472,11 +476,14 @@ public class ShawnResourceFragment extends Fragment implements View.OnClickListe
                                                 if (!itemObj.isNull("file_size")) {
                                                     dto.fileSize = itemObj.getLong("file_size");
                                                 }
-                                                if (!itemObj.isNull("file_path")) {
-                                                    dto.dataUrl = itemObj.getString("file_path");
-                                                }
-                                                if (!itemObj.isNull("file_url")) {
-                                                    dto.videoUrl = itemObj.getString("file_url");
+                                                if (TextUtils.equals(dto.fileType, CONST.FILETYPE2)) {//视频
+                                                    if (!itemObj.isNull("file_url")) {
+                                                        dto.filePath = itemObj.getString("file_url");
+                                                    }
+                                                }else {
+                                                    if (!itemObj.isNull("file_path")) {
+                                                        dto.filePath = itemObj.getString("file_path");
+                                                    }
                                                 }
                                                 dataList.add(dto);
                                                 dataLists.add(dto);
@@ -568,11 +575,14 @@ public class ShawnResourceFragment extends Fragment implements View.OnClickListe
                                                 if (!itemObj.isNull("file_size")) {
                                                     dto.fileSize = itemObj.getLong("file_size");
                                                 }
-                                                if (!itemObj.isNull("file_path")) {
-                                                    dto.dataUrl = itemObj.getString("file_path");
-                                                }
-                                                if (!itemObj.isNull("file_url")) {
-                                                    dto.videoUrl = itemObj.getString("file_url");
+                                                if (TextUtils.equals(dto.fileType, CONST.FILETYPE2)) {//视频
+                                                    if (!itemObj.isNull("file_url")) {
+                                                        dto.filePath = itemObj.getString("file_url");
+                                                    }
+                                                }else {
+                                                    if (!itemObj.isNull("file_path")) {
+                                                        dto.filePath = itemObj.getString("file_path");
+                                                    }
                                                 }
                                                 dataList.add(dto);
                                                 dataLists.add(dto);
@@ -861,7 +871,7 @@ public class ShawnResourceFragment extends Fragment implements View.OnClickListe
      * 下载文件
      */
     private void dialogDownload() {
-        int count = 0;
+        int count = 0;//选中文件个数
         for (int i = 0; i < dataList.size(); i++) {
             ShawnDto dto = dataList.get(i);
             if (dto.isSelected) {
@@ -869,7 +879,7 @@ public class ShawnResourceFragment extends Fragment implements View.OnClickListe
             }
         }
         if (count <= 0) {
-            Toast.makeText(getActivity(), "请选中一个文件", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "请选中一个非文件夹文件", Toast.LENGTH_SHORT).show();
         }else {
             LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View view = inflater.inflate(R.layout.shawn_dialog_delete, null);
@@ -895,16 +905,20 @@ public class ShawnResourceFragment extends Fragment implements View.OnClickListe
                 @Override
                 public void onClick(View arg0) {
                     dialog.dismiss();
+                    List<ShawnDto> list = new ArrayList<>();//需要保存的list
                     for (int i = 0; i < dataList.size(); i++) {
                         ShawnDto dto = dataList.get(i);
                         if (dto.isSelected) {
-                            if (TextUtils.equals(dto.fileType, CONST.FILETYPE2)) {//视频
-                                OkHttpDownload(dto.videoUrl, dto.title);
+                            if (!TextUtils.equals(dto.fileType, CONST.FILETYPE5)) {//支持下载非文件夹类型文件
+                                OkHttpDownload(dto.filePath, dto.title);
+                                list.add(dto);
                             }else {
-                                OkHttpDownload(dto.dataUrl, dto.title);
+                                Toast.makeText(getActivity(), "不支持文件夹下载", Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
+                    CommonUtil.saveDownloadInfo(getActivity(), list);
+                    Toast.makeText(getActivity(), "文件下载中", Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -912,15 +926,15 @@ public class ShawnResourceFragment extends Fragment implements View.OnClickListe
 
     /**
      * 下载文件
-     * @param dataUrl
+     * @param filePath
      * @param fileName
      */
-    private void OkHttpDownload(final String dataUrl, final String fileName) {
+    private void OkHttpDownload(final String filePath, final String fileName) {
         showDialog();
         new Thread(new Runnable() {
             @Override
             public void run() {
-                OkHttpUtil.enqueue(new Request.Builder().url(dataUrl).build(), new Callback() {
+                OkHttpUtil.enqueue(new Request.Builder().url(filePath).build(), new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
                     }

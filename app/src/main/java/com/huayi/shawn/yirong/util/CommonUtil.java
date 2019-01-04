@@ -1,6 +1,7 @@
 package com.huayi.shawn.yirong.util;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
@@ -24,6 +25,7 @@ import com.amap.api.services.district.DistrictItem;
 import com.amap.api.services.district.DistrictResult;
 import com.amap.api.services.district.DistrictSearch;
 import com.amap.api.services.district.DistrictSearchQuery;
+import com.huayi.shawn.yirong.common.CONST;
 import com.huayi.shawn.yirong.dto.ShawnDto;
 
 import org.json.JSONArray;
@@ -795,16 +797,17 @@ public class CommonUtil {
                     int id = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID));
                     String displayName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME));
                     String mimeType = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.MIME_TYPE));
-                    long size = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE));
+                    long fileSize = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE));
                     String title = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.TITLE));
-                    String imgPath = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));
+                    String filePath = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));
                     long width = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.WIDTH));
                     long height = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.HEIGHT));
 
                     ShawnDto dto = new ShawnDto();
                     dto.title = title;
-                    dto.imgPath = imgPath;
-                    dto.fileSize = size;
+                    dto.filePath = filePath;
+                    dto.fileSize = fileSize;
+                    dto.fileType = CONST.FILETYPE1;
                     list.add(0, dto);
                 }
                 cursor.close();
@@ -833,7 +836,7 @@ public class CommonUtil {
                     String displayName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME));
                     String mimeType = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.MIME_TYPE));
                     long duration = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION));
-                    long size = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.SIZE));
+                    long fileSize = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.SIZE));
                     String filePath = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA));
 
 //                    MediaMetadataRetriever retr = new MediaMetadataRetriever();
@@ -863,9 +866,10 @@ public class CommonUtil {
                     }
                     ShawnDto dto = new ShawnDto();
                     dto.title = title;
-                    dto.filePath = filePath;
                     dto.imgPath = imgPath;
-                    dto.fileSize = size;
+                    dto.filePath = filePath;
+                    dto.fileSize = fileSize;
+                    dto.fileType = CONST.FILETYPE2;
                     list.add(0, dto);
                 }
                 cursor.close();
@@ -904,6 +908,118 @@ public class CommonUtil {
         }
         BigDecimal result4 = new BigDecimal(teraBytes);
         return result4.setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString()+ "TB";
+    }
+
+    /**
+     *  保存下载列表数据
+     */
+    public static void saveDownloadInfo(Context context, List<ShawnDto> dataList) {
+        dataList.addAll(readDownloadInfo(context));
+
+        SharedPreferences sharedPreferences = context.getSharedPreferences("DOWNLOAD", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("size", dataList.size());
+        for (int i = 0; i < dataList.size(); i++) {
+            ShawnDto dto = dataList.get(i);
+
+            editor.remove("title"+i);
+//            editor.remove("time"+i);
+            editor.remove("fileType"+i);
+            editor.remove("filePath"+i);
+            editor.remove("fileSize"+i);
+
+            editor.putString("title"+i, dto.title);
+//            editor.putString("time"+i, dto.time);
+            editor.putString("fileType"+i, dto.fileType);
+            editor.putString("filePath"+i, dto.filePath);
+            editor.putLong("fileSize"+i, dto.fileSize);
+        }
+        editor.apply();
+    }
+
+    /**
+     *  读取下载列表数据
+     */
+    public static List<ShawnDto> readDownloadInfo(Context context) {
+        List<ShawnDto> dataList = new ArrayList<>();
+        SharedPreferences sharedPreferences = context.getSharedPreferences("DOWNLOAD", Context.MODE_PRIVATE);
+        int size = sharedPreferences.getInt("size", 0);
+        for (int i = 0; i < size; i++) {
+            ShawnDto dto = new ShawnDto();
+            dto.title = sharedPreferences.getString("title"+i, "");
+//            dto.time = sharedPreferences.getString("time"+i, "");
+            dto.fileType = sharedPreferences.getString("fileType"+i, "");
+            dto.filePath = sharedPreferences.getString("filePath"+i, "");
+            dto.fileSize = sharedPreferences.getLong("fileSize"+i, 0);
+            dataList.add(dto);
+        }
+        return dataList;
+    }
+
+    /**
+     *  清除下载列表数据
+     */
+    public static void clearDownloadInfo(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("DOWNLOAD", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
+    }
+
+    /**
+     *  保存上传列表数据
+     */
+    public static void saveUploadInfo(Context context, List<ShawnDto> dataList) {
+        dataList.addAll(readUploadInfo(context));
+
+        SharedPreferences sharedPreferences = context.getSharedPreferences("UPLOAD", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("size", dataList.size());
+        for (int i = 0; i < dataList.size(); i++) {
+            ShawnDto dto = dataList.get(i);
+
+            editor.remove("title"+i);
+//            editor.remove("time"+i);
+            editor.remove("fileType"+i);
+            editor.remove("filePath"+i);
+            editor.remove("fileSize"+i);
+
+            editor.putString("title"+i, dto.title);
+//            editor.putString("time"+i, dto.time);
+            editor.putString("fileType"+i, dto.fileType);
+            editor.putString("filePath"+i, dto.filePath);
+            editor.putLong("fileSize"+i, dto.fileSize);
+        }
+        editor.apply();
+    }
+
+    /**
+     *  读取上传列表数据
+     */
+    public static List<ShawnDto> readUploadInfo(Context context) {
+        List<ShawnDto> dataList = new ArrayList<>();
+        SharedPreferences sharedPreferences = context.getSharedPreferences("UPLOAD", Context.MODE_PRIVATE);
+        int size = sharedPreferences.getInt("size", 0);
+        for (int i = 0; i < size; i++) {
+            ShawnDto dto = new ShawnDto();
+            dto.title = sharedPreferences.getString("title"+i, "");
+//            dto.time = sharedPreferences.getString("time"+i, "");
+            dto.fileType = sharedPreferences.getString("fileType"+i, "");
+            dto.filePath = sharedPreferences.getString("filePath"+i, "");
+            dto.fileSize = sharedPreferences.getLong("fileSize"+i, 0);
+            dataList.add(dto);
+        }
+        return dataList;
+    }
+
+    /**
+     *  清除上传列表数据
+     */
+    public static void clearUploadInfo(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("UPLOAD", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
     }
 
 }

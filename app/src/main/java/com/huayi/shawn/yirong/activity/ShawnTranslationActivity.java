@@ -3,7 +3,6 @@ package com.huayi.shawn.yirong.activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,23 +10,21 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.huayi.shawn.yirong.R;
-import com.huayi.shawn.yirong.fragment.ShawnGaojianAllFragment;
-import com.huayi.shawn.yirong.fragment.ShawnGaojianCheckFragment;
-import com.huayi.shawn.yirong.fragment.ShawnResourceFragment;
+import com.huayi.shawn.yirong.fragment.ShawnDownloadFragment;
+import com.huayi.shawn.yirong.fragment.ShawnUploadFragment;
 import com.huayi.shawn.yirong.view.MainViewPager;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 资源库
+ * 资源库-传输列表
  */
-public class ShawnResourceActivity extends ShawnBaseActivity implements View.OnClickListener {
+public class ShawnTranslationActivity extends ShawnBaseActivity implements View.OnClickListener {
 
     private Context context;
     private TextView tv1,tv2;
@@ -37,7 +34,7 @@ public class ShawnResourceActivity extends ShawnBaseActivity implements View.OnC
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.shawn_activity_resource);
+        setContentView(R.layout.shawn_activity_translation);
         if (Build.VERSION.SDK_INT >= 23) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
@@ -49,15 +46,11 @@ public class ShawnResourceActivity extends ShawnBaseActivity implements View.OnC
     private void initWidget() {
         LinearLayout llBack = findViewById(R.id.llBack);
         llBack.setOnClickListener(this);
-        ImageView ivShare = findViewById(R.id.ivShare);
-        ivShare.setImageResource(R.drawable.shawn_icon_list);
-        ivShare.setVisibility(View.VISIBLE);
-        ivShare.setOnClickListener(this);
         tv1 = findViewById(R.id.tv1);
-        tv1.setText("个人库");
+        tv1.setText("下载列表");
         tv1.setOnClickListener(new MyOnClickListener(0));
         tv2 = findViewById(R.id.tv2);
-        tv2.setText("公共库");
+        tv2.setText("上传列表");
         tv2.setOnClickListener(new MyOnClickListener(1));
     }
 
@@ -65,17 +58,9 @@ public class ShawnResourceActivity extends ShawnBaseActivity implements View.OnC
      * 初始化viewPager
      */
     private void initViewPager() {
-        Fragment fragment = new ShawnResourceFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("columnId", "1");//个人库，columnid
-        bundle.putString("parentId", "0");//父级id
-        fragment.setArguments(bundle);
+        Fragment fragment = new ShawnDownloadFragment();
         fragments.add(fragment);
-        fragment = new ShawnResourceFragment();
-        bundle = new Bundle();
-        bundle.putString("columnId", "2");//公共库，columnid
-        bundle.putString("parentId", "0");//父级id
-        fragment.setArguments(bundle);
+        fragment = new ShawnUploadFragment();
         fragments.add(fragment);
 
         viewPager = findViewById(R.id.viewPager);
@@ -178,9 +163,6 @@ public class ShawnResourceActivity extends ShawnBaseActivity implements View.OnC
         switch (v.getId()) {
             case R.id.llBack:
                 finish();
-                break;
-            case R.id.ivShare:
-                startActivity(new Intent(this, ShawnTranslationActivity.class));
                 break;
 
         }
