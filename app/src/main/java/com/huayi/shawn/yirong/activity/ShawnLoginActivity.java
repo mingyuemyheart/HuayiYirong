@@ -19,7 +19,7 @@ import android.widget.Toast;
 import com.huayi.shawn.yirong.R;
 import com.huayi.shawn.yirong.common.MyApplication;
 import com.huayi.shawn.yirong.util.OkHttpUtil;
-import com.huayi.shawn.yirong.util.sofia.Sofia;
+import com.huayi.shawn.yirong.view.sofia.Sofia;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import org.json.JSONException;

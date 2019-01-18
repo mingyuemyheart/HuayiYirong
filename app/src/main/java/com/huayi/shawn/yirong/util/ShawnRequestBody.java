@@ -16,19 +16,19 @@ import okio.Source;
 public class ShawnRequestBody extends RequestBody {
 
     public interface ProgressListener {
-        void transferred( long size );
+        void transferred(long size);
     }
 
     public static final int SEGMENT_SIZE = 2*1024; // okio.Segment.SIZE
 
     protected File file;
-    protected ProgressListener listener;
+    protected ProgressListener rogressListener;
     protected String contentType;
 
-    public ShawnRequestBody(File file, String contentType, ProgressListener listener) {
+    public ShawnRequestBody(File file, String contentType, ProgressListener rogressListener) {
         this.file = file;
         this.contentType = contentType;
-        this.listener = listener;
+        this.rogressListener = rogressListener;
     }
 
     protected ShawnRequestBody() {}
@@ -54,9 +54,11 @@ public class ShawnRequestBody extends RequestBody {
             while ((read = source.read(sink.buffer(), SEGMENT_SIZE)) != -1) {
                 total += read;
                 sink.flush();
-                this.listener.transferred(total);
-
+                if (rogressListener != null) {
+                    rogressListener.transferred(total);
+                }
             }
+
         } finally {
             Util.closeQuietly(source);
         }

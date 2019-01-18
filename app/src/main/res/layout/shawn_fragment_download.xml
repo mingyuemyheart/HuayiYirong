@@ -6,47 +6,110 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/divider1"
+        android:id="@+id/tvPath"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="10dp"
+        android:paddingTop="5dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="5dp"
+        android:textColor="@color/text_color4"
+        android:textSize="@dimen/level_5"/>
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/divider3"
+        android:layout_below="@+id/tvPath"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvLoading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/gray"
+                android:paddingStart="10dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="5dp"
+                android:textColor="@color/refresh_color1"
+                android:textSize="@dimen/level_5"/>
+
+            <com.huayi.shawn.yirong.view.ScrollviewListview
+                android:id="@+id/listView1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:cacheColorHint="@color/transparent"
+                android:divider="@color/light_gray"
+                android:dividerHeight="0.5dp"
+                android:listSelector="@color/transparent"
+                android:overScrollMode="never"
+                android:scrollbars="none"/>
+
+            <TextView
+                android:id="@+id/tvComplete"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/gray"
+                android:paddingStart="10dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="5dp"
+                android:textColor="@color/refresh_color1"
+                android:textSize="@dimen/level_5"/>
+
+            <com.huayi.shawn.yirong.view.ScrollviewListview
+                android:id="@+id/listView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:cacheColorHint="@color/transparent"
+                android:divider="@color/light_gray"
+                android:dividerHeight="0.5dp"
+                android:listSelector="@color/transparent"
+                android:overScrollMode="never"
+                android:scrollbars="none"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/divider3"
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
+        android:layout_above="@+id/llDelete"
         android:background="@color/light_gray"/>
 
-    <TextView
-        android:id="@+id/tvPath"
-        android:layout_below="@+id/divider1"
+    <LinearLayout
+        android:id="@+id/llDelete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/text_color4"
-        android:textSize="@dimen/level_5"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/shawn_selector_mk_files"
+        android:gravity="center"
+        android:orientation="vertical"
         android:paddingTop="5dp"
-        android:paddingBottom="5dp"/>
+        android:paddingBottom="5dp">
 
-    <TextView
-        android:id="@+id/tvComplete"
-        android:layout_below="@+id/tvPath"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/gray"
-        android:textColor="@color/refresh_color1"
-        android:textSize="@dimen/level_5"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"/>
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/shawn_icon_delete_blue"/>
 
-    <ListView
-        android:id="@+id/listView"
-        android:layout_below="@+id/tvComplete"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:cacheColorHint="@color/transparent"
-        android:divider="@color/light_gray"
-        android:dividerHeight="0.5dp"
-        android:listSelector="@color/transparent"
-        android:overScrollMode="never"
-        android:scrollbars="none"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="删除"
+            android:textColor="@color/refresh_color1"
+            android:textSize="@dimen/level_5"/>
+
+    </LinearLayout>
+
 
 </RelativeLayout>
-

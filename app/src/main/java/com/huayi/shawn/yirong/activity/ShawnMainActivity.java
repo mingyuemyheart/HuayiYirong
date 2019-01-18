@@ -37,9 +37,8 @@ import com.huayi.shawn.yirong.util.CommonUtil;
 import com.huayi.shawn.yirong.util.OkHttpUtil;
 import com.huayi.shawn.yirong.util.SecretUrlUtil;
 import com.huayi.shawn.yirong.util.WeatherUtil;
-import com.huayi.shawn.yirong.util.sofia.Sofia;
+import com.huayi.shawn.yirong.view.sofia.Sofia;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -117,6 +116,7 @@ public class ShawnMainActivity extends ShawnBaseActivity implements AMapLocation
         int width = dm.widthPixels;
 
         ImageView imageView = findViewById(R.id.imageView);
+        imageView.setImageResource(R.drawable.shawn_bg_main_title);
         ViewGroup.LayoutParams params = imageView.getLayoutParams();
         params.width = width;
         params.height = width*71/125;
@@ -308,6 +308,7 @@ public class ShawnMainActivity extends ShawnBaseActivity implements AMapLocation
      * 获取主界面数据
      */
     private void OkHttpList() {
+        dataList.clear();
         ShawnDto dto = new ShawnDto();
         dto.title = "稿件";
         dataList.add(dto);

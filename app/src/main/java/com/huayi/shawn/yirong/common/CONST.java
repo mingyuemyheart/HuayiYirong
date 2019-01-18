@@ -40,8 +40,11 @@ public class CONST {
 	private static String SDCARD_PATH = Environment.getExternalStorageDirectory()+"/Yirong";
 	public static String DOWNLOAD_ADDR = SDCARD_PATH + "/download/";//下载视频保存的路径
 	public static String FILETYPE1 = "1",FILETYPE2 = "2",FILETYPE3 = "3",FILETYPE4 = "4",FILETYPE5 = "5";//1图片、2视频、3音频、4文档、5文件夹
+	public static int loadComplete = 1, loadPercent = -1;//下载、上传文件完成、未完成状态
 
 	//广播
 	public static String BROADCAST_CONTROL = "broadcast_control";//控制资源库下方操作按钮状态
+	public static String BROADCAST_DOWNLOAD_PROGRESS = "broadcast_download_progress";//下载文件进度
+	public static String BROADCAST_UPLOAD_PROGRESS = "broadcast_upload_progress";//上传文件进度
 
 }

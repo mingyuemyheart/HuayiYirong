@@ -1,6 +1,7 @@
 package com.huayi.shawn.yirong.util;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -9,17 +10,25 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.LocationManager;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.amap.api.maps.AMap;
+import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.LatLngBounds;
 import com.amap.api.maps.model.PolygonOptions;
 import com.amap.api.services.district.DistrictItem;
 import com.amap.api.services.district.DistrictResult;
@@ -323,43 +332,52 @@ public class CommonUtil {
     /**
      * 绘制区域
      */
-    public static void drawDistrict(final Context context, String keywords, final AMap aMap) {
-        DistrictSearch search = new DistrictSearch(context);
-        DistrictSearchQuery query = new DistrictSearchQuery();
-        query.setKeywords(keywords);//传入关键字
-        query.setShowBoundary(true);//是否返回边界值
-        search.setQuery(query);
-        search.searchDistrictAsyn();
-        search.setOnDistrictSearchListener(new DistrictSearch.OnDistrictSearchListener() {
+    public static void drawDistrict(final Context context, final String keywords, final AMap aMap) {
+        new Thread(new Runnable() {
             @Override
-            public void onDistrictSearched(DistrictResult districtResult) {
-                if (districtResult == null|| districtResult.getDistrict()==null) {
-                    return;
-                }
-                final DistrictItem item = districtResult.getDistrict().get(0);
-                if (item == null) {
-                    return;
-                }
-                new Thread() {
-                    public void run() {
-                        String[] polyStr = item.districtBoundary();
-                        if (polyStr == null || polyStr.length == 0) {
+            public void run() {
+                DistrictSearch search = new DistrictSearch(context);
+                DistrictSearchQuery query = new DistrictSearchQuery();
+                query.setKeywords(keywords);//传入关键字
+                query.setShowBoundary(true);//是否返回边界值
+                search.setQuery(query);
+                search.searchDistrictAsyn();
+                search.setOnDistrictSearchListener(new DistrictSearch.OnDistrictSearchListener() {
+                    @Override
+                    public void onDistrictSearched(DistrictResult districtResult) {
+                        if (districtResult == null|| districtResult.getDistrict()==null) {
                             return;
                         }
-                        for (String str : polyStr) {
-                            String[] lat = str.split(";");
-                            PolygonOptions polygonOptions = new PolygonOptions();
-                            for (String latstr : lat) {
-                                String[] lats = latstr.split(",");
-                                polygonOptions.add(new LatLng(Double.parseDouble(lats[1]), Double.parseDouble(lats[0])));
-                            }
-                            polygonOptions.strokeWidth(8).strokeColor(0xff059cd4).fillColor(0x5000FF00);
-                            aMap.addPolygon(polygonOptions);
+                        final DistrictItem item = districtResult.getDistrict().get(0);
+                        if (item == null) {
+                            return;
                         }
+                        new Thread() {
+                            public void run() {
+                                String[] polyStr = item.districtBoundary();
+                                if (polyStr == null || polyStr.length == 0) {
+                                    return;
+                                }
+                                LatLngBounds.Builder builder = LatLngBounds.builder();
+                                for (String str : polyStr) {
+                                    String[] lat = str.split(";");
+                                    PolygonOptions polygonOptions = new PolygonOptions();
+                                    for (String latstr : lat) {
+                                        String[] lats = latstr.split(",");
+                                        LatLng latLng = new LatLng(Double.parseDouble(lats[1]), Double.parseDouble(lats[0]));
+                                        polygonOptions.add(latLng);
+                                        builder.include(latLng);
+                                    }
+                                    polygonOptions.strokeWidth(6).strokeColor(0xff059cd4).fillColor(0x5000FF00);
+                                    aMap.addPolygon(polygonOptions);
+                                }
+                                aMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 50));
+                            }
+                        }.start();
                     }
-                }.start();
+                });//绑定监听器
             }
-        });//绑定监听器
+        }).start();
     }
 
     /**
@@ -914,8 +932,6 @@ public class CommonUtil {
      *  保存下载列表数据
      */
     public static void saveDownloadInfo(Context context, List<ShawnDto> dataList) {
-        dataList.addAll(readDownloadInfo(context));
-
         SharedPreferences sharedPreferences = context.getSharedPreferences("DOWNLOAD", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt("size", dataList.size());
@@ -923,16 +939,16 @@ public class CommonUtil {
             ShawnDto dto = dataList.get(i);
 
             editor.remove("title"+i);
-//            editor.remove("time"+i);
             editor.remove("fileType"+i);
             editor.remove("filePath"+i);
             editor.remove("fileSize"+i);
+            editor.remove("loadState"+i);
 
             editor.putString("title"+i, dto.title);
-//            editor.putString("time"+i, dto.time);
             editor.putString("fileType"+i, dto.fileType);
             editor.putString("filePath"+i, dto.filePath);
             editor.putLong("fileSize"+i, dto.fileSize);
+            editor.putInt("loadState"+i, dto.loadState);
         }
         editor.apply();
     }
@@ -947,10 +963,10 @@ public class CommonUtil {
         for (int i = 0; i < size; i++) {
             ShawnDto dto = new ShawnDto();
             dto.title = sharedPreferences.getString("title"+i, "");
-//            dto.time = sharedPreferences.getString("time"+i, "");
             dto.fileType = sharedPreferences.getString("fileType"+i, "");
             dto.filePath = sharedPreferences.getString("filePath"+i, "");
             dto.fileSize = sharedPreferences.getLong("fileSize"+i, 0);
+            dto.loadState = sharedPreferences.getInt("loadState"+i, CONST.loadPercent);
             dataList.add(dto);
         }
         return dataList;
@@ -970,8 +986,6 @@ public class CommonUtil {
      *  保存上传列表数据
      */
     public static void saveUploadInfo(Context context, List<ShawnDto> dataList) {
-        dataList.addAll(readUploadInfo(context));
-
         SharedPreferences sharedPreferences = context.getSharedPreferences("UPLOAD", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt("size", dataList.size());
@@ -979,16 +993,20 @@ public class CommonUtil {
             ShawnDto dto = dataList.get(i);
 
             editor.remove("title"+i);
-//            editor.remove("time"+i);
             editor.remove("fileType"+i);
             editor.remove("filePath"+i);
             editor.remove("fileSize"+i);
+            editor.remove("loadState"+i);
+            editor.remove("columnId"+i);
+            editor.remove("parentId"+i);
 
             editor.putString("title"+i, dto.title);
-//            editor.putString("time"+i, dto.time);
             editor.putString("fileType"+i, dto.fileType);
             editor.putString("filePath"+i, dto.filePath);
             editor.putLong("fileSize"+i, dto.fileSize);
+            editor.putInt("loadState"+i, dto.loadState);
+            editor.putString("columnId"+i, dto.columnId);
+            editor.putString("parentId"+i, dto.pid);
         }
         editor.apply();
     }
@@ -1003,10 +1021,12 @@ public class CommonUtil {
         for (int i = 0; i < size; i++) {
             ShawnDto dto = new ShawnDto();
             dto.title = sharedPreferences.getString("title"+i, "");
-//            dto.time = sharedPreferences.getString("time"+i, "");
             dto.fileType = sharedPreferences.getString("fileType"+i, "");
             dto.filePath = sharedPreferences.getString("filePath"+i, "");
             dto.fileSize = sharedPreferences.getLong("fileSize"+i, 0);
+            dto.loadState = sharedPreferences.getInt("loadState"+i, -1);
+            dto.columnId = sharedPreferences.getString("columnId"+i, "1");
+            dto.pid = sharedPreferences.getString("parentId"+i, "0");
             dataList.add(dto);
         }
         return dataList;
@@ -1020,6 +1040,185 @@ public class CommonUtil {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.apply();
+    }
+
+    /**
+     * 跳转至wps-office
+     * @param filePath
+     */
+    public static void intentWPSOffice(Context context, String filePath) {
+        if (context == null || TextUtils.isEmpty(filePath)) {
+            return;
+        }
+        Uri uri;
+        File file = new File(filePath);
+        if (file.exists()) {
+            final String authority = context.getPackageName()+".fileprovider";
+            boolean build = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N;
+            uri = build ? FileProvider.getUriForFile(context, authority, file) : Uri.fromFile(file);
+        }else {
+            uri = Uri.parse(filePath);
+        }
+        Intent intent = context.getPackageManager().getLaunchIntentForPackage("cn.wps.moffice_eng");//WPS个人版的包名
+        if (intent == null) {
+            context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=cn.wps.moffice_eng")));
+            Toast.makeText(context, "可下载WPS Office来打开文件", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Bundle bundle = new Bundle();
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);//添加这一句表示对目标应用临时授权该Uri所代表的文件
+        intent.setData(uri);//这里采用传入文档的在线地址进行打开，免除下载的步骤，也不需要判断安卓版本号
+        intent.putExtras(bundle);
+        context.startActivity(intent);
+    }
+
+    public static void openLocalFiles(Context context, String filePath) {
+        if (context == null || TextUtils.isEmpty(filePath)) {
+            return;
+        }
+        Uri uri;
+        File file = new File(filePath);
+        if (file.exists()) {
+            final String authority = context.getPackageName()+".fileprovider";
+            boolean build = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N;
+            uri = build ? FileProvider.getUriForFile(context, authority, file) : Uri.fromFile(file);
+        }else {
+            uri = Uri.parse(filePath);
+        }
+        Intent intent = new Intent("android.intent.action.VIEW");
+        intent.addCategory("android.intent.category.DEFAULT");
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);//添加这一句表示对目标应用临时授权该Uri所代表的文件
+        intent.setData(uri);
+        String lowCase = filePath.toLowerCase();
+        if (fileImage(lowCase)) {
+            intent.setType("image/*");
+        }else if (filePdf(lowCase)) {
+            intent.setType("application/pdf");
+        }else if (fileText(lowCase)) {
+            intent.setType("text/plain");
+        }else if (fileAudio(lowCase)) {
+            intent.setType("audio/*");
+        }else if (fileVideo(lowCase)) {
+            intent.setType("video/*");
+        }else if (fileWord(lowCase)) {
+            intent.setType("application/msword");
+        }else if (fileExcel(lowCase)) {
+            intent.setType("application/vnd.ms-excel");
+        }else if (filePpt(lowCase)) {
+            intent.setType("application/vnd.ms-powerpoint");
+        }
+        context.startActivity(intent);
+    }
+
+    public static boolean fileImage(String filePath) {
+        if (TextUtils.isEmpty(filePath)) {
+            return false;
+        }
+        String lowCase = filePath.toLowerCase();
+        if (lowCase.endsWith(".png") || lowCase.endsWith(".gif") || lowCase.endsWith(".jpg") || lowCase.endsWith(".jpeg") || lowCase.endsWith(".bmp")) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean fileAudio(String filePath) {
+        if (TextUtils.isEmpty(filePath)) {
+            return false;
+        }
+        String lowCase = filePath.toLowerCase();
+        if (lowCase.endsWith(".mp3") || lowCase.endsWith(".wav") || lowCase.endsWith(".ogg") || lowCase.endsWith(".midi")) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean fileVideo(String filePath) {
+        if (TextUtils.isEmpty(filePath)) {
+            return false;
+        }
+        String lowCase = filePath.toLowerCase();
+        if (lowCase.endsWith(".mp4") || lowCase.endsWith(".rmvb") || lowCase.endsWith(".avi") || lowCase.endsWith(".flv")) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean fileText(String filePath) {
+        if (TextUtils.isEmpty(filePath)) {
+            return false;
+        }
+        String lowCase = filePath.toLowerCase();
+        if (lowCase.endsWith(".txt") || lowCase.endsWith(".rmvb") || lowCase.endsWith(".avi") || lowCase.endsWith(".flv")) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean fileWord(String filePath) {
+        if (TextUtils.isEmpty(filePath)) {
+            return false;
+        }
+        String lowCase = filePath.toLowerCase();
+        if (lowCase.endsWith(".doc") || lowCase.endsWith(".docx")) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean fileExcel(String filePath) {
+        if (TextUtils.isEmpty(filePath)) {
+            return false;
+        }
+        String lowCase = filePath.toLowerCase();
+        if (lowCase.endsWith(".xls") || lowCase.endsWith(".xlsx")) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean filePpt(String filePath) {
+        if (TextUtils.isEmpty(filePath)) {
+            return false;
+        }
+        String lowCase = filePath.toLowerCase();
+        if (lowCase.endsWith(".ppt") || lowCase.endsWith(".pptx")) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean filePdf(String filePath) {
+        if (TextUtils.isEmpty(filePath)) {
+            return false;
+        }
+        String lowCase = filePath.toLowerCase();
+        if (lowCase.endsWith(".pdf")) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean filePackage(String filePath) {
+        if (TextUtils.isEmpty(filePath)) {
+            return false;
+        }
+        String lowCase = filePath.toLowerCase();
+        if (lowCase.endsWith(".jar") || lowCase.endsWith(".zip") || lowCase.endsWith(".rar") || lowCase.endsWith(".gz") || lowCase.endsWith(".apk") || lowCase.endsWith(".img")) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean fileWeb(String filePath) {
+        if (TextUtils.isEmpty(filePath)) {
+            return false;
+        }
+        String lowCase = filePath.toLowerCase();
+        if (lowCase.endsWith(".htm") || lowCase.endsWith(".html") || lowCase.endsWith(".php") || lowCase.endsWith(".jsp")) {
+            return true;
+        }
+        return false;
     }
 
 }

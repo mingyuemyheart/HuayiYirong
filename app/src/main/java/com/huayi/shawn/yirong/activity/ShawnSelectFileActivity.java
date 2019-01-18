@@ -18,6 +18,7 @@ import com.huayi.shawn.yirong.R;
 import com.huayi.shawn.yirong.adapter.ShawnSelectFileAdapter;
 import com.huayi.shawn.yirong.common.CONST;
 import com.huayi.shawn.yirong.dto.ShawnDto;
+import com.huayi.shawn.yirong.util.CommonUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -87,7 +88,8 @@ public class ShawnSelectFileActivity extends ShawnBaseActivity implements View.O
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(mContext, "该类型文件不支持预览", Toast.LENGTH_SHORT).show();
+                ShawnDto dto = dataList.get(position);
+                CommonUtil.intentWPSOffice(mContext, dto.filePath);
             }
         });
     }
@@ -104,15 +106,6 @@ public class ShawnSelectFileActivity extends ShawnBaseActivity implements View.O
             @Override
             public void run() {
                 getFileName(files, suffix);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (mAdapter != null) {
-                            mAdapter.notifyDataSetChanged();
-                        }
-                        refreshLayout.setRefreshing(false);
-                    }
-                });
             }
         }).start();
     }
@@ -135,6 +128,15 @@ public class ShawnSelectFileActivity extends ShawnBaseActivity implements View.O
                                 dataList.add(dto);
                             }
                         }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (mAdapter != null) {
+                                    mAdapter.notifyDataSetChanged();
+                                }
+                                refreshLayout.setRefreshing(false);
+                            }
+                        });
                     }
                 }
             }

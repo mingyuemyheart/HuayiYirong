@@ -1,5 +1,6 @@
 package com.huayi.shawn.yirong.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -17,11 +18,11 @@ import com.huayi.shawn.yirong.util.CommonUtil;
 import java.util.List;
 
 /**
- * 资源库-传输列表
+ * 资源库-传输列表-下载完成
  */
-public class ShawnTranslationAdapter extends BaseAdapter {
+public class ShawnTranslationCompleteAdapter extends BaseAdapter {
 
-	private Context context;
+	private Activity activity;
 	private LayoutInflater mInflater;
 	private List<ShawnDto> mArrayList;
 
@@ -30,10 +31,10 @@ public class ShawnTranslationAdapter extends BaseAdapter {
 		ImageView imageView,ivSelected;
 	}
 
-	public ShawnTranslationAdapter(Context context, List<ShawnDto> mArrayList) {
-		this.context = context;
+	public ShawnTranslationCompleteAdapter(Activity activity, List<ShawnDto> mArrayList) {
+		this.activity = activity;
 		this.mArrayList = mArrayList;
-		mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		mInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	}
 
 	@Override
@@ -53,69 +54,69 @@ public class ShawnTranslationAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		ViewHolder mHolder;
+		ViewHolder mholder;
 		if (convertView == null) {
-			convertView = mInflater.inflate(R.layout.shawn_adapter_translation, null);
-			mHolder = new ViewHolder();
-			mHolder.imageView = convertView.findViewById(R.id.imageView);
-			mHolder.tvTitle = convertView.findViewById(R.id.tvTitle);
-			mHolder.tvSize = convertView.findViewById(R.id.tvSize);
-			mHolder.ivSelected = convertView.findViewById(R.id.ivSelected);
-			convertView.setTag(mHolder);
+			convertView = mInflater.inflate(R.layout.shawn_adapter_translation_complete, null);
+			mholder = new ViewHolder();
+			mholder.imageView = convertView.findViewById(R.id.imageView);
+			mholder.tvTitle = convertView.findViewById(R.id.tvTitle);
+			mholder.tvSize = convertView.findViewById(R.id.tvSize);
+			mholder.ivSelected = convertView.findViewById(R.id.ivSelected);
+			convertView.setTag(mholder);
 		}else {
-			mHolder = (ViewHolder) convertView.getTag();
+			mholder = (ViewHolder) convertView.getTag();
 		}
 
 		final ShawnDto dto = mArrayList.get(position);
 
 		if (!TextUtils.isEmpty(dto.title)) {
-			mHolder.tvTitle.setText(dto.title);
+			mholder.tvTitle.setText(dto.title);
 		}
 
 		if (TextUtils.equals(dto.fileType, CONST.FILETYPE5)) {
-			mHolder.tvSize.setText("");
+			mholder.tvSize.setText("");
 		}else {
-			mHolder.tvSize.setText(CommonUtil.getFormatSize(dto.fileSize));
+			mholder.tvSize.setText(CommonUtil.getFormatSize(dto.fileSize));
 		}
 
 		//1图片、2视频、3音频、4文档、5文件夹
 		if (TextUtils.equals(dto.fileType, CONST.FILETYPE1)) {
-			mHolder.imageView.setImageResource(R.drawable.shawn_icon_image);
+			mholder.imageView.setImageResource(R.drawable.shawn_icon_image);
 		}else if (TextUtils.equals(dto.fileType, CONST.FILETYPE2)) {
-			mHolder.imageView.setImageResource(R.drawable.shawn_icon_video);
+			mholder.imageView.setImageResource(R.drawable.shawn_icon_video);
 		}else if (TextUtils.equals(dto.fileType, CONST.FILETYPE3)) {
-			mHolder.imageView.setImageResource(R.drawable.shawn_icon_txt);
+			mholder.imageView.setImageResource(R.drawable.shawn_icon_txt);
 		}else if (TextUtils.equals(dto.fileType, CONST.FILETYPE4)) {
 			String lowCase = dto.filePath.toLowerCase();
-			if (lowCase.contains(CONST.doc) || lowCase.endsWith(CONST.docx)) {
-				mHolder.imageView.setImageResource(R.drawable.shawn_icon_word);
+			if (lowCase.endsWith(CONST.doc) || lowCase.endsWith(CONST.docx)) {
+				mholder.imageView.setImageResource(R.drawable.shawn_icon_word);
 			}else if (lowCase.endsWith(CONST.ppt) || lowCase.endsWith(CONST.pptx)) {
-				mHolder.imageView.setImageResource(R.drawable.shawn_icon_ppt);
+				mholder.imageView.setImageResource(R.drawable.shawn_icon_ppt);
 			}else if (lowCase.endsWith(CONST.pdf)) {
-				mHolder.imageView.setImageResource(R.drawable.shawn_icon_pdf);
+				mholder.imageView.setImageResource(R.drawable.shawn_icon_pdf);
 			}else if (lowCase.endsWith(CONST.xls) || lowCase.endsWith(CONST.xlsx)) {
-				mHolder.imageView.setImageResource(R.drawable.shawn_icon_xls);
+				mholder.imageView.setImageResource(R.drawable.shawn_icon_xls);
 			}else {
-				mHolder.imageView.setImageResource(R.drawable.shawn_icon_txt);
+				mholder.imageView.setImageResource(R.drawable.shawn_icon_txt);
 			}
 		}else if (TextUtils.equals(dto.fileType, CONST.FILETYPE5)) {
-			mHolder.imageView.setImageResource(R.drawable.shawn_icon_files);
+			mholder.imageView.setImageResource(R.drawable.shawn_icon_files);
 		}else {
-			mHolder.imageView.setImageResource(R.drawable.shawn_icon_txt);
+			mholder.imageView.setImageResource(R.drawable.shawn_icon_txt);
 		}
 
 		if (TextUtils.equals(dto.title, CONST.lastFile)) {
-			mHolder.ivSelected.setVisibility(View.INVISIBLE);
+			mholder.ivSelected.setVisibility(View.INVISIBLE);
 		}else {
-			mHolder.ivSelected.setVisibility(View.VISIBLE);
+			mholder.ivSelected.setVisibility(View.VISIBLE);
 			if (dto.isSelected) {
-				mHolder.ivSelected.setImageResource(R.drawable.shawn_icon_selected);
+				mholder.ivSelected.setImageResource(R.drawable.shawn_icon_selected);
 			}else {
-				mHolder.ivSelected.setImageResource(R.drawable.shawn_icon_unselected);
+				mholder.ivSelected.setImageResource(R.drawable.shawn_icon_unselected);
 			}
 		}
 
-		mHolder.ivSelected.setOnClickListener(new View.OnClickListener() {
+		mholder.ivSelected.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				dto.isSelected = !dto.isSelected;

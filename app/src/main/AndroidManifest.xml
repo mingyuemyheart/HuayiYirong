@@ -25,6 +25,12 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
 
+        <!--下载服务-->
+        <service android:name=".service.DownloadService"/>
+
+        <!--上传服务-->
+        <service android:name=".service.UploadService"/>
+
         <!-- 自动更新下载完成广播 -->
         <receiver android:name="com.huayi.shawn.yirong.util.AutoUpdateBroadcastReceiver" >
             <intent-filter>
@@ -39,6 +45,16 @@
             android:value="b3061ac96fda545bdb9c8d3bb01bd0df"/>
         <!-- 定位需要的服务 -->
         <service android:name="com.amap.api.location.APSService" />
+
+        <provider
+            android:authorities="com.huayi.shawn.yirong.fileprovider"
+            android:name="android.support.v4.content.FileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
 
         <activity
             android:name=".activity.ShawnWelcomeActivity"
@@ -113,6 +129,10 @@
 
         <activity
             android:name=".activity.ShawnTranslationActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".activity.ShawnWebviewActivity"
             android:screenOrientation="portrait"/>
 
     </application>

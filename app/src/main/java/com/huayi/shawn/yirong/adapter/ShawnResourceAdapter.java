@@ -93,7 +93,7 @@ public class ShawnResourceAdapter extends BaseAdapter {
 			mHolder.imageView.setImageResource(R.drawable.shawn_icon_txt);
 		}else if (TextUtils.equals(dto.fileType, CONST.FILETYPE4)) {
 			String lowCase = dto.filePath.toLowerCase();
-			if (lowCase.contains(CONST.doc) || lowCase.endsWith(CONST.docx)) {
+			if (lowCase.endsWith(CONST.doc) || lowCase.endsWith(CONST.docx)) {
 				mHolder.imageView.setImageResource(R.drawable.shawn_icon_word);
 			}else if (lowCase.endsWith(CONST.ppt) || lowCase.endsWith(CONST.pptx)) {
 				mHolder.imageView.setImageResource(R.drawable.shawn_icon_ppt);

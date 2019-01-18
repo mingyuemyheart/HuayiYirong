@@ -41,6 +41,8 @@ import com.huayi.shawn.yirong.adapter.ShawnResourceAdapter;
 import com.huayi.shawn.yirong.common.CONST;
 import com.huayi.shawn.yirong.common.MyApplication;
 import com.huayi.shawn.yirong.dto.ShawnDto;
+import com.huayi.shawn.yirong.service.DownloadService;
+import com.huayi.shawn.yirong.service.UploadService;
 import com.huayi.shawn.yirong.util.AuthorityUtil;
 import com.huayi.shawn.yirong.util.CommonUtil;
 import com.huayi.shawn.yirong.util.OkHttpUtil;
@@ -236,7 +238,7 @@ public class ShawnResourceFragment extends Fragment implements View.OnClickListe
                     intent.putExtra(CONST.WEB_URL, dto.filePath);
                     startActivity(intent);
                 }else if (TextUtils.equals(dto.fileType, CONST.FILETYPE4)) {
-                    Toast.makeText(getActivity(), "该类型文件不支持预览", Toast.LENGTH_SHORT).show();
+                    CommonUtil.intentWPSOffice(getActivity(), dto.filePath);
                 }else if (TextUtils.equals(dto.fileType, CONST.FILETYPE5)) {
                     String fid;
                     if (TextUtils.equals(dto.title, CONST.lastFile)) {//点击返回上级目录
@@ -413,13 +415,17 @@ public class ShawnResourceFragment extends Fragment implements View.OnClickListe
                         List<ShawnDto> list = new ArrayList<>();
                         ShawnDto dto = data.getParcelableExtra("data");
                         if (dto != null) {
+                            dto.columnId = columnId;
+                            dto.pid = parentId;
                             list.add(dto);
                         }
+                        list.addAll(CommonUtil.readUploadInfo(getActivity()));
                         CommonUtil.saveUploadInfo(getActivity(), list);
                         Toast.makeText(getActivity(), "文件上传中", Toast.LENGTH_SHORT).show();
-                        if (dto != null) {
-                            OkHttpUpload(dto.filePath, dto.fileSize);
-                        }
+                        getActivity().startService(new Intent(getActivity(), UploadService.class));
+//                        if (dto != null) {
+//                            OkHttpUpload(dto.filePath, dto.fileSize);
+//                        }
                     }
                     break;
             }
@@ -910,15 +916,17 @@ public class ShawnResourceFragment extends Fragment implements View.OnClickListe
                         ShawnDto dto = dataList.get(i);
                         if (dto.isSelected) {
                             if (!TextUtils.equals(dto.fileType, CONST.FILETYPE5)) {//支持下载非文件夹类型文件
-                                OkHttpDownload(dto.filePath, dto.title);
+//                                OkHttpDownload(dto.filePath, dto.title);
                                 list.add(dto);
                             }else {
                                 Toast.makeText(getActivity(), "不支持文件夹下载", Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
+                    list.addAll(CommonUtil.readDownloadInfo(getActivity()));
                     CommonUtil.saveDownloadInfo(getActivity(), list);
                     Toast.makeText(getActivity(), "文件下载中", Toast.LENGTH_SHORT).show();
+                    getActivity().startService(new Intent(getActivity(), DownloadService.class));
                 }
             });
         }

@@ -20,7 +20,6 @@ import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.LatLng;
-import com.amap.api.maps.model.LatLngBounds;
 import com.amap.api.maps.model.Marker;
 import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.animation.ScaleAnimation;
@@ -107,14 +106,12 @@ public class ShawnWarningMapFragment extends Fragment implements AMap.OnMapClick
             public void run() {
                 removeMarkers();
                 LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                LatLngBounds.Builder builder = LatLngBounds.builder();
                 for (WarningDto dto : warningList) {
                     MarkerOptions optionsTemp = new MarkerOptions();
                     optionsTemp.title(dto.lat+","+dto.lng);
                     optionsTemp.anchor(0.5f, 0.5f);
                     LatLng latlng = new LatLng(dto.lat, dto.lng);
                     optionsTemp.position(latlng);
-                    builder.include(latlng);
 
                     View view = inflater.inflate(R.layout.shawn_warning_marker_icon, null);
                     ImageView ivMarker = view.findViewById(R.id.ivMarker);
@@ -136,9 +133,6 @@ public class ShawnWarningMapFragment extends Fragment implements AMap.OnMapClick
                     Marker marker = aMap.addMarker(optionsTemp);
                     markers.add(marker);
                     expandMarker(marker);
-                }
-                if (warningList.size() > 0) {
-                    aMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 100));
                 }
             }
         }).start();

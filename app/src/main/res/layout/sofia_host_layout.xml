@@ -17,14 +17,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.huayi.shawn.yirong.util.sofia.StatusView
+    <com.huayi.shawn.yirong.view.sofia.StatusView
         android:id="@+id/status_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:background="@color/transparent" />
 
-    <com.huayi.shawn.yirong.util.sofia.NavigationView
+    <com.huayi.shawn.yirong.view.sofia.NavigationView
         android:id="@+id/navigation_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
