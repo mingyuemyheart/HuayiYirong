@@ -125,7 +125,9 @@
 
         <activity
             android:name=".activity.ShawnVideoActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="nosensor"
+            android:configChanges="orientation|keyboard|keyboardHidden|screenSize"
+            android:windowSoftInputMode="adjustResize"/>
 
         <activity
             android:name=".activity.ShawnTranslationActivity"

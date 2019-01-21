@@ -14,29 +14,84 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/reTitle">
 
-        <SurfaceView
-            android:id="@+id/surfaceView"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/llSurfaceView"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
+            android:background="@color/black"
+            android:orientation="vertical" >
+
+            <SurfaceView
+                android:id="@+id/surfaceView"
+                android:layout_width="match_parent"
+                android:layout_height="200dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llBottom"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_alignBottom="@+id/llSurfaceView"
+            android:background="@drawable/shawn_bg_bottom_controller"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp">
+
+            <ImageView
+                android:id="@+id/ivPlayLand"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:padding="5dp"
+                android:src="@drawable/shawn_icon_play"/>
+
+            <TextView
+                android:id="@+id/tvStartTimeLand"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:text="00:00"
+                android:textColor="@color/white"
+                android:textSize="@dimen/level_5"/>
+
+            <SeekBar
+                android:id="@+id/seekBarLand"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:maxHeight="2dp"
+                android:minHeight="2dp"
+                android:progress="0"
+                android:progressDrawable="@drawable/shawn_seekbar_drawable"
+                android:thumb="@drawable/shawn_seekbar_thumb"
+                android:thumbOffset="0dp"/>
+
+            <TextView
+                android:id="@+id/tvEndTimeLand"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:text="00:00"
+                android:textColor="@color/white"
+                android:textSize="@dimen/level_5"/>
+
+            <ImageView
+                android:id="@+id/ivInFull"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:padding="8dp"
+                android:src="@drawable/shawn_icon_expand"/>
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="@android:style/Widget.DeviceDefault.ProgressBar"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:layout_centerInParent="true"/>
-
-        <ImageView
-            android:id="@+id/ivPlay"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_centerInParent="true"
-            android:visibility="gone"/>
-
     </RelativeLayout>
-
-    <com.wang.avi.AVLoadingIndicatorView
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/loadingView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:visibility="visible"
-        app:indicator="LineScalePulseOutRapid"
-        app:indicator_color="@color/refresh_color1"/>
 
 </RelativeLayout>

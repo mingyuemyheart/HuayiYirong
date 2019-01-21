@@ -3,17 +3,20 @@ package com.huayi.shawn.yirong.activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.huayi.shawn.yirong.R;
+import com.huayi.shawn.yirong.common.CONST;
 import com.huayi.shawn.yirong.fragment.ShawnDownloadFragment;
 import com.huayi.shawn.yirong.fragment.ShawnUploadFragment;
 import com.huayi.shawn.yirong.view.MainViewPager;
@@ -158,11 +161,29 @@ public class ShawnTranslationActivity extends ShawnBaseActivity implements View.
         }
     }
 
+    /**
+     * 发送刷新数据广播
+     */
+    private void sendFreshBroadcast() {
+        Intent intent = new Intent();
+        intent.setAction(CONST.BROADCAST_REFRESH_RESOURCE);
+        sendBroadcast(intent);
+        finish();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            sendFreshBroadcast();
+        }
+        return false;
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.llBack:
-                finish();
+                sendFreshBroadcast();
                 break;
 
         }

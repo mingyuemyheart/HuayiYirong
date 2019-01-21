@@ -859,9 +859,9 @@ public class CommonUtil {
 
 //                    MediaMetadataRetriever retr = new MediaMetadataRetriever();
 //                    retr.setDataSource(filePath);
-////                    Bitmap bm = retr.getFrameAtTime();
-////                    long width = bm.getWidth();
-////                    long height = bm.getHeight();
+//                    Bitmap bm = retr.getFrameAtTime();
+//                    long width = bm.getWidth();
+//                    long height = bm.getHeight();
 //                    long width,height;
 //                    String rotation = retr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION);//视频旋转方向
 //                    if (TextUtils.equals(rotation, "0")) {

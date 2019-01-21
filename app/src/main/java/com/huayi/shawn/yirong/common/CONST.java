@@ -46,5 +46,6 @@ public class CONST {
 	public static String BROADCAST_CONTROL = "broadcast_control";//控制资源库下方操作按钮状态
 	public static String BROADCAST_DOWNLOAD_PROGRESS = "broadcast_download_progress";//下载文件进度
 	public static String BROADCAST_UPLOAD_PROGRESS = "broadcast_upload_progress";//上传文件进度
+	public static String BROADCAST_REFRESH_RESOURCE = "broadcast_refresh_resource";//刷新资源库数据
 
 }

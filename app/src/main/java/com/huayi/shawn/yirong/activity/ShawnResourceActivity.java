@@ -16,8 +16,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.huayi.shawn.yirong.R;
-import com.huayi.shawn.yirong.fragment.ShawnGaojianAllFragment;
-import com.huayi.shawn.yirong.fragment.ShawnGaojianCheckFragment;
 import com.huayi.shawn.yirong.fragment.ShawnResourceFragment;
 import com.huayi.shawn.yirong.view.MainViewPager;
 

@@ -60,6 +60,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import okhttp3.Call;
@@ -270,14 +272,21 @@ public class ShawnResourceFragment extends Fragment implements View.OnClickListe
         mReceiver = new MyBroadCastReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(CONST.BROADCAST_CONTROL);
+        intentFilter.addAction(CONST.BROADCAST_REFRESH_RESOURCE);
         getActivity().registerReceiver(mReceiver, intentFilter);
     }
 
     private class MyBroadCastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (TextUtils.equals(intent.getAction(), CONST.BROADCAST_CONTROL)) {
+            if (TextUtils.equals(intent.getAction(), CONST.BROADCAST_CONTROL)) {//控制底部操作栏
                 setBottomState();
+            }else if (TextUtils.equals(intent.getAction(), CONST.BROADCAST_REFRESH_RESOURCE)) {//刷新数据
+                if (itemLevel == 0) {
+                    refresh();
+                }else {
+                    OkHttpItemList(parentId, parentId);
+                }
             }
         }
     }
@@ -460,6 +469,8 @@ public class ShawnResourceFragment extends Fragment implements View.OnClickListe
                                     try {
                                         JSONObject obj = new JSONObject(result);
                                         if (!obj.isNull("data")) {
+                                            List<ShawnDto> list1 = new ArrayList<>();//保存文件夹list
+                                            List<ShawnDto> list2 = new ArrayList<>();//非文件夹
                                             JSONArray array = obj.getJSONArray("data");
                                             for (int i = 0; i < array.length(); i++) {
                                                 ShawnDto dto = new ShawnDto();
@@ -491,9 +502,37 @@ public class ShawnResourceFragment extends Fragment implements View.OnClickListe
                                                         dto.filePath = itemObj.getString("file_path");
                                                     }
                                                 }
-                                                dataList.add(dto);
-                                                dataLists.add(dto);
+
+                                                if (TextUtils.equals(dto.fileType, "5")) {//文件夹
+                                                    list1.add(dto);
+                                                }else {
+                                                    list2.add(dto);
+                                                }
                                             }
+
+                                            Collections.sort(list1, new Comparator<ShawnDto>() {
+                                                @Override
+                                                public int compare(ShawnDto arg0, ShawnDto arg1) {
+                                                    if (TextUtils.isEmpty(arg0.time) || TextUtils.isEmpty(arg1.time)) {
+                                                        return 0;
+                                                    }else {
+                                                        return arg1.time.compareTo(arg0.time);
+                                                    }
+                                                }
+                                            });
+                                            Collections.sort(list2, new Comparator<ShawnDto>() {
+                                                @Override
+                                                public int compare(ShawnDto arg0, ShawnDto arg1) {
+                                                    if (TextUtils.isEmpty(arg0.time) || TextUtils.isEmpty(arg1.time)) {
+                                                        return 0;
+                                                    }else {
+                                                        return arg1.time.compareTo(arg0.time);
+                                                    }
+                                                }
+                                            });
+                                            dataList.addAll(list1);
+                                            dataList.addAll(list2);
+                                            dataLists.addAll(dataList);
 
                                             setBottomState();
                                             if (mAdapter != null) {
@@ -559,6 +598,8 @@ public class ShawnResourceFragment extends Fragment implements View.OnClickListe
                                     try {
                                         JSONObject obj = new JSONObject(result);
                                         if (!obj.isNull("data")) {
+                                            List<ShawnDto> list1 = new ArrayList<>();//保存文件夹list
+                                            List<ShawnDto> list2 = new ArrayList<>();//非文件夹
                                             JSONArray array = obj.getJSONArray("data");
                                             for (int i = 0; i < array.length(); i++) {
                                                 ShawnDto dto = new ShawnDto();
@@ -590,10 +631,37 @@ public class ShawnResourceFragment extends Fragment implements View.OnClickListe
                                                         dto.filePath = itemObj.getString("file_path");
                                                     }
                                                 }
-                                                dataList.add(dto);
-                                                dataLists.add(dto);
+
+                                                if (TextUtils.equals(dto.fileType, "5")) {//文件夹
+                                                    list1.add(dto);
+                                                }else {
+                                                    list2.add(dto);
+                                                }
                                             }
 
+                                            Collections.sort(list1, new Comparator<ShawnDto>() {
+                                                @Override
+                                                public int compare(ShawnDto arg0, ShawnDto arg1) {
+                                                    if (TextUtils.isEmpty(arg0.time) || TextUtils.isEmpty(arg1.time)) {
+                                                        return 0;
+                                                    }else {
+                                                        return arg1.time.compareTo(arg0.time);
+                                                    }
+                                                }
+                                            });
+                                            Collections.sort(list2, new Comparator<ShawnDto>() {
+                                                @Override
+                                                public int compare(ShawnDto arg0, ShawnDto arg1) {
+                                                    if (TextUtils.isEmpty(arg0.time) || TextUtils.isEmpty(arg1.time)) {
+                                                        return 0;
+                                                    }else {
+                                                        return arg1.time.compareTo(arg0.time);
+                                                    }
+                                                }
+                                            });
+                                            dataList.addAll(list1);
+                                            dataList.addAll(list2);
+                                            dataLists.addAll(dataList);
                                             setBottomState();
                                             if (mAdapter != null) {
                                                 mAdapter.notifyDataSetChanged();

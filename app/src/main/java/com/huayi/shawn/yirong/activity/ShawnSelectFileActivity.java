@@ -120,26 +120,31 @@ public class ShawnSelectFileActivity extends ShawnBaseActivity implements View.O
                     if (!TextUtils.isEmpty(fileName)) {
                         for (String s : suffix) {
                             if (fileName.endsWith(s)) {
-                                ShawnDto dto = new ShawnDto();
+                                final ShawnDto dto = new ShawnDto();
                                 dto.title = fileName;
                                 dto.fileType = CONST.FILETYPE4;
                                 dto.filePath = file.getAbsolutePath();
                                 dto.fileSize = file.length();
-                                dataList.add(dto);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        dataList.add(dto);
+                                        if (mAdapter != null) {
+                                            mAdapter.notifyDataSetChanged();
+                                        }
+                                    }
+                                });
                             }
                         }
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (mAdapter != null) {
-                                    mAdapter.notifyDataSetChanged();
-                                }
-                                refreshLayout.setRefreshing(false);
-                            }
-                        });
                     }
                 }
             }
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    refreshLayout.setRefreshing(false);
+                }
+            });
         }
     }
 

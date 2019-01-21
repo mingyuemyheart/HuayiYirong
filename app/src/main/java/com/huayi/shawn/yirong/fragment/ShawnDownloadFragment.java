@@ -326,22 +326,29 @@ public class ShawnDownloadFragment extends Fragment implements View.OnClickListe
                 dialog.dismiss();
                 //先停止下载，在删除
                 getActivity().stopService(new Intent(getActivity(), DownloadService.class));
+
+                List<ShawnDto> list1 = new ArrayList<>();
                 for (int i = 0; i < dataList1.size(); i++) {
                     ShawnDto dto = dataList1.get(i);
-                    if (dto.isSelected) {
-                        dataList1.remove(dto);
+                    if (!dto.isSelected) {
+                        list1.add(dto);
                     }
                 }
+                dataList1.clear();
+                dataList1.addAll(list1);
                 if (mAdapter1 != null) {
                     mAdapter1.notifyDataSetChanged();
                 }
 
+                List<ShawnDto> list2 = new ArrayList<>();
                 for (int i = 0; i < dataList2.size(); i++) {
                     ShawnDto dto = dataList2.get(i);
-                    if (dto.isSelected) {
-                        dataList2.remove(dto);
+                    if (!dto.isSelected) {
+                        list2.add(dto);
                     }
                 }
+                dataList2.clear();
+                dataList2.addAll(list2);
                 if (mAdapter2 != null) {
                     mAdapter2.notifyDataSetChanged();
                 }
