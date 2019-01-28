@@ -37,7 +37,7 @@ public class CONST {
 	public static final String VIDEO_PATH = "video_path";//本地视频路径
 
 	//通用
-	private static String SDCARD_PATH = Environment.getExternalStorageDirectory()+"/Yirong";
+	public static String SDCARD_PATH = Environment.getExternalStorageDirectory()+"/Yirong";
 	public static String DOWNLOAD_ADDR = SDCARD_PATH + "/download/";//下载视频保存的路径
 	public static String FILETYPE1 = "1",FILETYPE2 = "2",FILETYPE3 = "3",FILETYPE4 = "4",FILETYPE5 = "5";//1图片、2视频、3音频、4文档、5文件夹
 	public static int loadComplete = 1, loadPercent = -1;//下载、上传文件完成、未完成状态

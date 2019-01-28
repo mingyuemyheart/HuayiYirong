@@ -33,6 +33,8 @@ import okhttp3.Response;
 public class DownloadService extends Service {
 
     private Context context;
+    private int index = 0;//list下标
+    private List<ShawnDto> dataList = new ArrayList<>();
 
     public DownloadService() {
 
@@ -46,6 +48,11 @@ public class DownloadService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (index >= dataList.size()) {
+            index = 0;
+        }
+        dataList.clear();
+        dataList.addAll(CommonUtil.readDownloadInfo(context));
         OkHttpDownload();
         return super.onStartCommand(intent, flags, startId);
     }
@@ -53,6 +60,7 @@ public class DownloadService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        CommonUtil.saveDownloadInfo(context, dataList);
     }
 
     @Nullable
@@ -65,29 +73,20 @@ public class DownloadService extends Service {
      * 下载文件
      */
     private void OkHttpDownload() {
-        final List<ShawnDto> dataList = new ArrayList<>();
-        dataList.addAll(CommonUtil.readDownloadInfo(context));
-        final List<ShawnDto> dataList1 = new ArrayList<>();
-        final List<ShawnDto> dataList2 = new ArrayList<>();
-        dataList1.clear();
-        dataList2.clear();
-        //按照loadState区分正在下载、下载完成
-        for (int i = 0; i < dataList.size(); i++) {
-            ShawnDto dto = dataList.get(i);
-            if (dto.loadState == CONST.loadComplete) {
-                dataList2.add(dto);
-            }else {
-                dataList1.add(dto);
-            }
+        Log.e("index", index+"");
+        if (dataList.size() <= 0 || index >= dataList.size()) {
+            return;
+        }
+        final ShawnDto dto = dataList.get(index);
+        if (dto.loadState == CONST.loadComplete) {
+            index++;
+            OkHttpDownload();
+            return;
         }
 
         new Thread(new Runnable() {
             @Override
             public void run() {
-                if (dataList1.size() <= 0) {
-                    return;
-                }
-                final ShawnDto dto = dataList1.get(0);
                 OkHttpUtil.enqueue(new Request.Builder().url(dto.filePath).build(), new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
@@ -105,9 +104,8 @@ public class DownloadService extends Service {
                                 Log.e("downpro", dto.percent+"");
                                 if (success) {
                                     dto.loadState = CONST.loadComplete;
-                                    dataList2.add(0, dto);
-                                    dataList1.remove(0);
                                     CommonUtil.saveDownloadInfo(context, dataList);
+                                    index++;
                                     OkHttpDownload();
                                 }
                                 Intent intent = new Intent();

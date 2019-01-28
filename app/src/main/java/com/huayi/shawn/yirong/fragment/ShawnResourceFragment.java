@@ -46,18 +46,12 @@ import com.huayi.shawn.yirong.service.UploadService;
 import com.huayi.shawn.yirong.util.AuthorityUtil;
 import com.huayi.shawn.yirong.util.CommonUtil;
 import com.huayi.shawn.yirong.util.OkHttpUtil;
-import com.huayi.shawn.yirong.util.ShawnRequestBody;
-import com.huayi.shawn.yirong.util.ShawnResponseBody;
-import com.huayi.shawn.yirong.view.UploadProgressDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -67,9 +61,6 @@ import java.util.List;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
-import okhttp3.Headers;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -422,19 +413,11 @@ public class ShawnResourceFragment extends Fragment implements View.OnClickListe
                 case 1001://上传文件
                     if (data != null) {
                         List<ShawnDto> list = new ArrayList<>();
-                        ShawnDto dto = data.getParcelableExtra("data");
-                        if (dto != null) {
-                            dto.columnId = columnId;
-                            dto.pid = parentId;
-                            list.add(dto);
-                        }
                         list.addAll(CommonUtil.readUploadInfo(getActivity()));
+                        list.addAll(data.<ShawnDto>getParcelableArrayListExtra("dataList"));
                         CommonUtil.saveUploadInfo(getActivity(), list);
                         Toast.makeText(getActivity(), "文件上传中", Toast.LENGTH_SHORT).show();
                         getActivity().startService(new Intent(getActivity(), UploadService.class));
-//                        if (dto != null) {
-//                            OkHttpUpload(dto.filePath, dto.fileSize);
-//                        }
                     }
                     break;
             }
@@ -833,114 +816,6 @@ public class ShawnResourceFragment extends Fragment implements View.OnClickListe
         });
     }
 
-    private UploadProgressDialog uploadProgressDialog;
-    private void showDialog() {
-        if (uploadProgressDialog == null) {
-            uploadProgressDialog = new UploadProgressDialog(getActivity());
-        }
-        uploadProgressDialog.setPercent(0);
-        uploadProgressDialog.show();
-    }
-    private void cancelDialog() {
-        if (uploadProgressDialog != null) {
-            uploadProgressDialog.dismiss();
-        }
-    }
-    private void setDialogProgress(int progress) {
-        if (uploadProgressDialog != null) {
-            uploadProgressDialog.setPercent(progress);
-        }
-    }
-    /**
-     * 文件上传
-     * @param filePath
-     * @param totalSize 文件大小
-     */
-    private void OkHttpUpload(String filePath, final long totalSize) {
-        showDialog();
-        if (TextUtils.isEmpty(columnId) || TextUtils.isEmpty(parentId) || TextUtils.isEmpty(filePath)) {
-            Toast.makeText(getActivity(), "数据异常，修改失败", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        File file = new File(filePath);
-        if (!file.exists()) {
-            Toast.makeText(getActivity(), "数据异常，修改失败", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        final String url = "http://47.105.63.187:8081/interfaces/Resources/uploadfiles?token="+MyApplication.TOKEN;
-        final ShawnRequestBody shawnRequestBody = new ShawnRequestBody(file, "application/octet-stream", new ShawnRequestBody.ProgressListener() {
-            @Override
-            public void transferred(final long size) {
-                if (isAdded()) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            setDialogProgress((int)(100*size/totalSize));
-                        }
-                    });
-                }
-            }
-        });
-        String formData = String.format("form-data;name=file; filename=%s", file.getName());
-        final MultipartBody.Builder builder = new MultipartBody.Builder();
-        builder.setType(MultipartBody.FORM);
-        builder.addPart(Headers.of("Content-Disposition",formData), shawnRequestBody);
-        builder.addFormDataPart("cid", columnId);
-        builder.addFormDataPart("fid", parentId);
-        builder.addFormDataPart("file", file.getName(), RequestBody.create(MediaType.parse("image/*"), file));
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                OkHttpUtil.enqueue(new Request.Builder().post(builder.build()).url(url).build(), new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                    }
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        if (!response.isSuccessful()) {
-                            return;
-                        }
-                        final String result = response.body().string();
-                        if (!isAdded()) {
-                            return;
-                        }
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (!TextUtils.isEmpty(result)) {
-                                    try {
-                                        JSONObject obj = new JSONObject(result);
-                                        if (!obj.isNull("code")) {
-                                            String code = obj.getString("code");
-                                            if (TextUtils.equals(code, "200")) {
-                                                if (itemLevel == 0) {
-                                                    refresh();
-                                                }else {
-                                                    OkHttpItemList(parentId, parentId);
-                                                }
-                                            }
-                                        }
-                                        if (!obj.isNull("msg")) {
-                                            String msg = obj.getString("msg");
-                                            if (!TextUtils.isEmpty(msg)) {
-                                                Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
-                                            }
-                                        }
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-
-                                cancelDialog();
-                            }
-                        });
-                    }
-                });
-            }
-        }).start();
-    }
-
     /**
      * 下载文件
      */
@@ -980,90 +855,23 @@ public class ShawnResourceFragment extends Fragment implements View.OnClickListe
                 public void onClick(View arg0) {
                     dialog.dismiss();
                     List<ShawnDto> list = new ArrayList<>();//需要保存的list
+                    list.addAll(CommonUtil.readDownloadInfo(getActivity()));
                     for (int i = 0; i < dataList.size(); i++) {
                         ShawnDto dto = dataList.get(i);
                         if (dto.isSelected) {
                             if (!TextUtils.equals(dto.fileType, CONST.FILETYPE5)) {//支持下载非文件夹类型文件
-//                                OkHttpDownload(dto.filePath, dto.title);
                                 list.add(dto);
                             }else {
                                 Toast.makeText(getActivity(), "不支持文件夹下载", Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
-                    list.addAll(CommonUtil.readDownloadInfo(getActivity()));
                     CommonUtil.saveDownloadInfo(getActivity(), list);
                     Toast.makeText(getActivity(), "文件下载中", Toast.LENGTH_SHORT).show();
                     getActivity().startService(new Intent(getActivity(), DownloadService.class));
                 }
             });
         }
-    }
-
-    /**
-     * 下载文件
-     * @param filePath
-     * @param fileName
-     */
-    private void OkHttpDownload(final String filePath, final String fileName) {
-        showDialog();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                OkHttpUtil.enqueue(new Request.Builder().url(filePath).build(), new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                    }
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        if (!response.isSuccessful()) {
-                            return;
-                        }
-                        ShawnResponseBody body = new ShawnResponseBody(response.body(), new ShawnResponseBody.ProgressListener() {
-                            @Override
-                            public void transferred(final long pregressSize, final long totalSize, final boolean success) {
-                                if (isAdded()) {
-                                    getActivity().runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            setDialogProgress((int)(100*pregressSize/totalSize));
-                                            if (success) {
-                                                cancelDialog();
-                                                Toast.makeText(getActivity(), "下载完成", Toast.LENGTH_SHORT).show();
-                                            }
-                                        }
-                                    });
-                                }
-                            }
-                        });
-
-                        final byte[] bytes = body.bytes();
-                        if (!isAdded()) {
-                            return;
-                        }
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    File files = new File(CONST.DOWNLOAD_ADDR);
-                                    if (!files.exists()) {
-                                        files.mkdirs();
-                                    }
-                                    FileOutputStream fos = new FileOutputStream(new File(files.getAbsolutePath()+"/"+fileName));
-                                    BufferedOutputStream bos = new BufferedOutputStream(fos);
-                                    bos.write(bytes);
-                                    bos.close();
-                                } catch (FileNotFoundException e) {
-                                    e.printStackTrace();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
-                    }
-                });
-            }
-        }).start();
     }
 
     /**

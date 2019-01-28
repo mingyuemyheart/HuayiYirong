@@ -821,12 +821,14 @@ public class CommonUtil {
                     long width = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.WIDTH));
                     long height = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.HEIGHT));
 
-                    ShawnDto dto = new ShawnDto();
-                    dto.title = title;
-                    dto.filePath = filePath;
-                    dto.fileSize = fileSize;
-                    dto.fileType = CONST.FILETYPE1;
-                    list.add(0, dto);
+                    if (!filePath.contains(CONST.SDCARD_PATH)) {//过滤掉易融
+                        ShawnDto dto = new ShawnDto();
+                        dto.title = title;
+                        dto.filePath = filePath;
+                        dto.fileSize = fileSize;
+                        dto.fileType = CONST.FILETYPE1;
+                        list.add(0, dto);
+                    }
                 }
                 cursor.close();
             }
@@ -882,13 +884,15 @@ public class CommonUtil {
                     if (thumbCursor.moveToFirst()) {
                         imgPath = thumbCursor.getString(thumbCursor.getColumnIndex(MediaStore.Video.Thumbnails.DATA));
                     }
-                    ShawnDto dto = new ShawnDto();
-                    dto.title = title;
-                    dto.imgPath = imgPath;
-                    dto.filePath = filePath;
-                    dto.fileSize = fileSize;
-                    dto.fileType = CONST.FILETYPE2;
-                    list.add(0, dto);
+                    if (!filePath.contains(CONST.SDCARD_PATH)) {//过滤掉易融
+                        ShawnDto dto = new ShawnDto();
+                        dto.title = title;
+                        dto.imgPath = imgPath;
+                        dto.filePath = filePath;
+                        dto.fileSize = fileSize;
+                        dto.fileType = CONST.FILETYPE2;
+                        list.add(0, dto);
+                    }
                 }
                 cursor.close();
             }
@@ -943,12 +947,14 @@ public class CommonUtil {
             editor.remove("filePath"+i);
             editor.remove("fileSize"+i);
             editor.remove("loadState"+i);
+            editor.remove("fileId"+i);
 
             editor.putString("title"+i, dto.title);
             editor.putString("fileType"+i, dto.fileType);
             editor.putString("filePath"+i, dto.filePath);
             editor.putLong("fileSize"+i, dto.fileSize);
             editor.putInt("loadState"+i, dto.loadState);
+            editor.putInt("fileId"+i, dto.fileId);
         }
         editor.apply();
     }
@@ -999,6 +1005,7 @@ public class CommonUtil {
             editor.remove("loadState"+i);
             editor.remove("columnId"+i);
             editor.remove("parentId"+i);
+            editor.remove("fileId"+i);
 
             editor.putString("title"+i, dto.title);
             editor.putString("fileType"+i, dto.fileType);
@@ -1007,6 +1014,7 @@ public class CommonUtil {
             editor.putInt("loadState"+i, dto.loadState);
             editor.putString("columnId"+i, dto.columnId);
             editor.putString("parentId"+i, dto.pid);
+            editor.putInt("fileId"+i, dto.fileId);
         }
         editor.apply();
     }

@@ -17,7 +17,6 @@ import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.huayi.shawn.yirong.R;
 import com.huayi.shawn.yirong.activity.ShawnImageActivity;
@@ -25,27 +24,13 @@ import com.huayi.shawn.yirong.activity.ShawnVideoActivity;
 import com.huayi.shawn.yirong.adapter.ShawnTranslationCompleteAdapter;
 import com.huayi.shawn.yirong.adapter.ShawnTranslationPercentAdapter;
 import com.huayi.shawn.yirong.common.CONST;
-import com.huayi.shawn.yirong.common.MyApplication;
 import com.huayi.shawn.yirong.dto.ShawnDto;
 import com.huayi.shawn.yirong.service.DownloadService;
 import com.huayi.shawn.yirong.service.UploadService;
 import com.huayi.shawn.yirong.util.CommonUtil;
-import com.huayi.shawn.yirong.util.OkHttpUtil;
-import com.huayi.shawn.yirong.util.ShawnRequestBody;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Headers;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 /**
  * 资源库-上传列表
@@ -90,7 +75,7 @@ public class ShawnUploadFragment extends Fragment implements View.OnClickListene
                 ShawnDto data = intent.getParcelableExtra("data");
                 if (data != null) {
                     for (ShawnDto dto : dataList1) {
-                        if (TextUtils.equals(dto.title, data.title)) {
+                        if (TextUtils.equals(dto.title, data.title) && dto.fileId == data.fileId) {
                             dto.percent = data.percent;
                             dto.loadState = data.loadState;
                             Log.e("uploadPro", dto.percent+"");
@@ -118,6 +103,12 @@ public class ShawnUploadFragment extends Fragment implements View.OnClickListene
                     }
                 }
             }
+        }
+    }
+
+    private void unregisterBroadCast() {
+        if (mReceiver != null) {
+            getActivity().unregisterReceiver(mReceiver);
         }
     }
 
@@ -159,88 +150,6 @@ public class ShawnUploadFragment extends Fragment implements View.OnClickListene
         ListView listView = view.findViewById(R.id.listView1);
         mAdapter1 = new ShawnTranslationPercentAdapter(getActivity(), dataList1);
         listView.setAdapter(mAdapter1);
-
-//        OkHttpUpload();
-    }
-
-    /**
-     * 文件上传
-     */
-    private void OkHttpUpload() {
-        if (dataList1.size() <= 0) {
-            return;
-        }
-        final ShawnDto dto = dataList1.get(0);
-        if (TextUtils.isEmpty(dto.columnId) || TextUtils.isEmpty(dto.pid) || TextUtils.isEmpty(dto.filePath)) {
-            Toast.makeText(getActivity(), "数据异常，修改失败", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        File file = new File(dto.filePath);
-        if (!file.exists()) {
-            Toast.makeText(getActivity(), "文件不存在", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        final String url = "http://47.105.63.187:8081/interfaces/Resources/uploadfiles?token="+MyApplication.TOKEN;
-        final ShawnRequestBody shawnRequestBody = new ShawnRequestBody(file, "application/octet-stream", new ShawnRequestBody.ProgressListener() {
-            @Override
-            public void transferred(final long pregressSize) {
-                if (isAdded()) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            dto.percent = (int)(100*pregressSize/dto.fileSize);
-                            if (pregressSize >= dto.fileSize) {
-                                dto.loadState = CONST.loadComplete;
-                                dataList2.add(0, dto);
-                                if (mAdapter2 != null) {
-                                    mAdapter2.notifyDataSetChanged();
-                                }
-                                dataList1.remove(0);
-                                if (dataList1.size() <= 0) {
-                                    tvLoading.setVisibility(View.GONE);
-                                }else {
-                                    tvLoading.setVisibility(View.VISIBLE);
-                                }
-                                tvLoading.setText("正在上传("+dataList1.size()+")");
-                                tvComplete.setText("上传完成("+dataList2.size()+")");
-                                OkHttpUpload();
-                            }
-                            if (mAdapter1 != null) {
-                                mAdapter1.notifyDataSetChanged();
-                            }
-                        }
-                    });
-                }
-            }
-        });
-        String formData = String.format("form-data;name=file; filename=%s", file.getName());
-        final MultipartBody.Builder builder = new MultipartBody.Builder();
-        builder.setType(MultipartBody.FORM);
-        builder.addPart(Headers.of("Content-Disposition",formData), shawnRequestBody);
-        builder.addFormDataPart("cid", dto.columnId);
-        builder.addFormDataPart("fid", dto.pid);
-        builder.addFormDataPart("file", file.getName(), RequestBody.create(MediaType.parse("image/*"), file));
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                OkHttpUtil.enqueue(new Request.Builder().post(builder.build()).url(url).build(), new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                    }
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        if (!response.isSuccessful()) {
-                            return;
-                        }
-                        final String result = response.body().string();
-                        if (!isAdded()) {
-                            return;
-                        }
-                    }
-                });
-            }
-        }).start();
     }
 
     private void initListView2(View view) {
@@ -278,8 +187,9 @@ public class ShawnUploadFragment extends Fragment implements View.OnClickListene
     @Override
     public void onDestroy() {
         super.onDestroy();
-        CommonUtil.saveUploadInfo(getActivity(), dataList1);
-        CommonUtil.saveUploadInfo(getActivity(), dataList2);
+//        CommonUtil.saveUploadInfo(getActivity(), dataList1);
+//        CommonUtil.saveUploadInfo(getActivity(), dataList2);
+        unregisterBroadCast();
     }
 
     /**
@@ -312,22 +222,29 @@ public class ShawnUploadFragment extends Fragment implements View.OnClickListene
                 dialog.dismiss();
                 //先停止下载，在删除
                 getActivity().stopService(new Intent(getActivity(), DownloadService.class));
+
+                List<ShawnDto> list1 = new ArrayList<>();
                 for (int i = 0; i < dataList1.size(); i++) {
                     ShawnDto dto = dataList1.get(i);
-                    if (dto.isSelected) {
-                        dataList1.remove(dto);
+                    if (!dto.isSelected) {
+                        list1.add(dto);
                     }
                 }
+                dataList1.clear();
+                dataList1.addAll(list1);
                 if (mAdapter1 != null) {
                     mAdapter1.notifyDataSetChanged();
                 }
 
+                List<ShawnDto> list2 = new ArrayList<>();
                 for (int i = 0; i < dataList2.size(); i++) {
                     ShawnDto dto = dataList2.get(i);
-                    if (dto.isSelected) {
-                        dataList2.remove(dto);
+                    if (!dto.isSelected) {
+                        list2.add(dto);
                     }
                 }
+                dataList2.clear();
+                dataList2.addAll(list2);
                 if (mAdapter2 != null) {
                     mAdapter2.notifyDataSetChanged();
                 }

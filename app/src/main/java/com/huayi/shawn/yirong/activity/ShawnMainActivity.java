@@ -31,6 +31,8 @@ import com.huayi.shawn.yirong.adapter.ShawnMainAdapter;
 import com.huayi.shawn.yirong.common.MyApplication;
 import com.huayi.shawn.yirong.dto.ShawnDto;
 import com.huayi.shawn.yirong.common.CONST;
+import com.huayi.shawn.yirong.service.DownloadService;
+import com.huayi.shawn.yirong.service.UploadService;
 import com.huayi.shawn.yirong.util.AuthorityUtil;
 import com.huayi.shawn.yirong.util.AutoUpdateUtil;
 import com.huayi.shawn.yirong.util.CommonUtil;
@@ -81,6 +83,10 @@ public class ShawnMainActivity extends ShawnBaseActivity implements AMapLocation
         initRefreshLayout();
         initWidget();
         initListView();
+
+        //开启下载、上传线程
+        startService(new Intent(this, DownloadService.class));
+        startService(new Intent(this, UploadService.class));
     }
 
     /**

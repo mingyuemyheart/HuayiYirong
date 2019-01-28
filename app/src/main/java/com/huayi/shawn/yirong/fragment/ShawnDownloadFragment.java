@@ -27,21 +27,9 @@ import com.huayi.shawn.yirong.common.CONST;
 import com.huayi.shawn.yirong.dto.ShawnDto;
 import com.huayi.shawn.yirong.service.DownloadService;
 import com.huayi.shawn.yirong.util.CommonUtil;
-import com.huayi.shawn.yirong.util.OkHttpUtil;
-import com.huayi.shawn.yirong.util.ShawnResponseBody;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Request;
-import okhttp3.Response;
 
 /**
  * 资源库-下载列表
@@ -86,7 +74,7 @@ public class ShawnDownloadFragment extends Fragment implements View.OnClickListe
                 ShawnDto data = intent.getParcelableExtra("data");
                 if (data != null) {
                     for (ShawnDto dto : dataList1) {
-                        if (TextUtils.equals(dto.title, data.title)) {
+                        if (TextUtils.equals(dto.title, data.title) && dto.fileId == data.fileId) {
                             dto.percent = data.percent;
                             dto.loadState = data.loadState;
                             Log.e("pro", dto.percent+"");
@@ -117,6 +105,12 @@ public class ShawnDownloadFragment extends Fragment implements View.OnClickListe
         }
     }
 
+    private void unregisterBroadCast() {
+        if (mReceiver != null) {
+            getActivity().unregisterReceiver(mReceiver);
+        }
+    }
+
     private void initWidget(View view) {
         TextView tvPath = view.findViewById(R.id.tvPath);
         tvPath.setText("文件下载至："+CONST.DOWNLOAD_ADDR);
@@ -128,10 +122,6 @@ public class ShawnDownloadFragment extends Fragment implements View.OnClickListe
         LinearLayout llDelete = view.findViewById(R.id.llDelete);
         llDelete.setOnClickListener(this);
 
-        refresh();
-    }
-
-    private void refresh() {
         dataList.clear();
         dataList.addAll(CommonUtil.readDownloadInfo(getActivity()));
         dataList1.clear();
@@ -164,94 +154,6 @@ public class ShawnDownloadFragment extends Fragment implements View.OnClickListe
         ListView listView = view.findViewById(R.id.listView1);
         mAdapter1 = new ShawnTranslationPercentAdapter(getActivity(), dataList1);
         listView.setAdapter(mAdapter1);
-
-//        OkHttpDownload();
-    }
-
-    /**
-     * 下载文件
-     */
-    private void OkHttpDownload() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (dataList1.size() <= 0) {
-                    return;
-                }
-                final ShawnDto dto = dataList1.get(0);
-                OkHttpUtil.enqueue(new Request.Builder().url(dto.filePath).build(), new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                    }
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        if (!response.isSuccessful()) {
-                            return;
-                        }
-                        if (!isAdded()) {
-                            return;
-                        }
-                        ShawnResponseBody body = new ShawnResponseBody(response.body(), new ShawnResponseBody.ProgressListener() {
-                            @Override
-                            public void transferred(final long pregressSize, final long totalSize, final boolean success) {
-                                getActivity().runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        dto.percent = (int)(100*pregressSize/totalSize);
-                                        if (success) {
-                                            dto.loadState = CONST.loadComplete;
-                                            dataList2.add(0, dto);
-                                            if (mAdapter2 != null) {
-                                                mAdapter2.notifyDataSetChanged();
-                                            }
-                                            dataList1.remove(0);
-                                            if (dataList1.size() <= 0) {
-                                                tvLoading.setVisibility(View.GONE);
-                                            }else {
-                                                tvLoading.setVisibility(View.VISIBLE);
-                                            }
-                                            tvLoading.setText("正在下载("+dataList1.size()+")");
-                                            tvComplete.setText("下载完成("+dataList2.size()+")");
-                                            CommonUtil.saveDownloadInfo(getActivity(), dataList);
-                                            OkHttpDownload();
-                                        }
-                                        if (mAdapter1 != null) {
-                                            mAdapter1.notifyDataSetChanged();
-                                        }
-                                    }
-                                });
-                            }
-                        });
-
-                        final byte[] bytes = body.bytes();
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    File files = new File(CONST.DOWNLOAD_ADDR);
-                                    if (!files.exists()) {
-                                        files.mkdirs();
-                                    }
-                                    File file = new File(files.getAbsolutePath()+"/"+dto.title);
-                                    dto.filePath = file.getAbsolutePath();
-                                    if (mAdapter2 != null) {
-                                        mAdapter2.notifyDataSetChanged();
-                                    }
-                                    FileOutputStream fos = new FileOutputStream(file);
-                                    BufferedOutputStream bos = new BufferedOutputStream(fos);
-                                    bos.write(bytes);
-                                    bos.close();
-                                } catch (FileNotFoundException e) {
-                                    e.printStackTrace();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
-                    }
-                });
-            }
-        }).start();
     }
 
     private void initListView2(View view) {
@@ -289,11 +191,9 @@ public class ShawnDownloadFragment extends Fragment implements View.OnClickListe
     @Override
     public void onDestroy() {
         super.onDestroy();
-        CommonUtil.saveDownloadInfo(getActivity(), dataList1);
-        CommonUtil.saveDownloadInfo(getActivity(), dataList2);
-//        if (mReceiver != null) {
-//            getActivity().unregisterReceiver(mReceiver);
-//        }
+//        CommonUtil.saveDownloadInfo(getActivity(), dataList1);
+//        CommonUtil.saveDownloadInfo(getActivity(), dataList2);
+        unregisterBroadCast();
     }
 
     /**

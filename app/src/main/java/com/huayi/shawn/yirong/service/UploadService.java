@@ -8,7 +8,6 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.huayi.shawn.yirong.common.CONST;
 import com.huayi.shawn.yirong.common.MyApplication;
@@ -37,6 +36,8 @@ import okhttp3.Response;
 public class UploadService extends Service {
 
     private Context context;
+    private int index = 0;//list下标
+    private List<ShawnDto> dataList = new ArrayList<>();
 
     public UploadService() {
 
@@ -50,6 +51,11 @@ public class UploadService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (index >= dataList.size()) {
+            index = 0;
+        }
+        dataList.clear();
+        dataList.addAll(CommonUtil.readUploadInfo(context));
         OkHttpUpload();
         return super.onStartCommand(intent, flags, startId);
     }
@@ -57,6 +63,7 @@ public class UploadService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        CommonUtil.saveUploadInfo(context, dataList);
     }
 
     @Nullable
@@ -69,33 +76,25 @@ public class UploadService extends Service {
      * 文件上传
      */
     private void OkHttpUpload() {
-        final List<ShawnDto> dataList = new ArrayList<>();
-        dataList.addAll(CommonUtil.readUploadInfo(context));
-        final List<ShawnDto> dataList1 = new ArrayList<>();
-        final List<ShawnDto> dataList2 = new ArrayList<>();
-        dataList1.clear();
-        dataList2.clear();
-        //按照loadState区分正在上传、上传完成
-        for (int i = 0; i < dataList.size(); i++) {
-            ShawnDto dto = dataList.get(i);
-            if (dto.loadState == CONST.loadComplete) {
-                dataList2.add(dto);
-            }else {
-                dataList1.add(dto);
-            }
-        }
-
-        if (dataList1.size() <= 0) {
+        Log.e("index", index+"");
+        if (dataList.size() <= 0 || index >= dataList.size()) {
             return;
         }
-        final ShawnDto dto = dataList1.get(0);
+        final ShawnDto dto = dataList.get(index);
+        if (dto.loadState == CONST.loadComplete) {
+            index++;
+            OkHttpUpload();
+            return;
+        }
         if (TextUtils.isEmpty(dto.columnId) || TextUtils.isEmpty(dto.pid) || TextUtils.isEmpty(dto.filePath)) {
-            Toast.makeText(context, "数据异常，修改失败", Toast.LENGTH_SHORT).show();
+            index++;
+            OkHttpUpload();
             return;
         }
         File file = new File(dto.filePath);
-        if (!file.exists()) {
-            Toast.makeText(context, "文件不存在", Toast.LENGTH_SHORT).show();
+        if (!file.exists()) {//文件不存在
+            index++;
+            OkHttpUpload();
             return;
         }
         final String url = "http://47.105.63.187:8081/interfaces/Resources/uploadfiles?token="+MyApplication.TOKEN;
@@ -106,9 +105,8 @@ public class UploadService extends Service {
                 Log.e("uploadProgress", dto.percent+"");
                 if (pregressSize >= dto.fileSize) {
                     dto.loadState = CONST.loadComplete;
-                    dataList2.add(0, dto);
-                    dataList1.remove(0);
                     CommonUtil.saveUploadInfo(context, dataList);
+                    index++;
                     OkHttpUpload();
                 }
                 Intent intent = new Intent();
@@ -139,7 +137,10 @@ public class UploadService extends Service {
                         if (!response.isSuccessful()) {
                             return;
                         }
-                        final String result = response.body().string();
+                        //发送刷新数据广播，刷新资源库界面数据，为了停留在资源库界面刷新所用
+                        Intent intent1 = new Intent();
+                        intent1.setAction(CONST.BROADCAST_REFRESH_RESOURCE);
+                        sendBroadcast(intent1);
                     }
                 });
             }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
@@ -89,28 +90,21 @@ public class ShawnSelectImageActivity extends ShawnBaseActivity implements View.
                 finish();
                 break;
             case R.id.tvControl:
-                ShawnDto data = null;
-                String filePath = null;
-                long fileSize = 0;
+                List<ShawnDto> list = new ArrayList<>();
                 for (int i = 0; i < dataList.size(); i++) {
                     ShawnDto dto = dataList.get(i);
                     if (dto.isSelected) {
-                        data = dto;
-                        filePath = dto.filePath;
-                        fileSize = dto.fileSize;
-                        break;
+                        list.add(dto);
                     }
                 }
-                if (TextUtils.isEmpty(filePath)) {
+                if (list.size() <= 0) {
                     Toast.makeText(this, "请选取一个文件", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 Intent intent = new Intent();
                 Bundle bundle = new Bundle();
-                bundle.putParcelable("data", data);
+                bundle.putParcelableArrayList("dataList", (ArrayList<? extends Parcelable>) list);
                 intent.putExtras(bundle);
-                intent.putExtra("filePath", filePath);
-                intent.putExtra("fileSize", fileSize);
                 setResult(RESULT_OK, intent);
                 finish();
                 break;

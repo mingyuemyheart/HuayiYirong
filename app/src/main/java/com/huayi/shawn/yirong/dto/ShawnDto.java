@@ -16,6 +16,7 @@ public class ShawnDto implements Parcelable {
     public long fileSize;//文件大小
     public int loadState = CONST.loadPercent;//下载或者上传状态，1完成、-1未完成
     public int percent;
+    public int fileId;//文件id，区分相同名称文件
 
     public ShawnDto() {
     }
@@ -42,6 +43,7 @@ public class ShawnDto implements Parcelable {
         dest.writeLong(this.fileSize);
         dest.writeInt(this.loadState);
         dest.writeInt(this.percent);
+        dest.writeInt(this.fileId);
     }
 
     protected ShawnDto(Parcel in) {
@@ -60,6 +62,7 @@ public class ShawnDto implements Parcelable {
         this.fileSize = in.readLong();
         this.loadState = in.readInt();
         this.percent = in.readInt();
+        this.fileId = in.readInt();
     }
 
     public static final Creator<ShawnDto> CREATOR = new Creator<ShawnDto>() {
